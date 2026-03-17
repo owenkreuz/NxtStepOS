@@ -630,38 +630,16 @@
       showTyping();
 
       try {
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
+        const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 1000,
-            system: `You are the NxtStepOS AI assistant — a knowledgeable, professional insurance specialist embedded in the NxtStepOS platform. NxtStepOS is an AI-powered operating system built specifically for independent insurance agencies, focused on Commercial and Life insurance.
-
-Your role is to:
-1. Answer insurance coverage questions accurately and clearly — commercial general liability, BOP, workers comp, commercial auto, professional liability, E&O, life insurance (term, whole, universal, indexed), and more
-2. Help explain policies, coverage gaps, and what clients should consider
-3. Assist agents with understanding products they sell
-4. Tell prospects about NxtStepOS and what it does for agencies
-
-Your personality:
-- Professional but approachable — like a knowledgeable colleague, not a robot
-- Clear and direct — no unnecessary jargon, but use correct insurance terms
-- Helpful and solution-oriented
-- Never give specific premium quotes or bind coverage — always note that a licensed agent will finalize details
-- Keep responses concise but complete — 2-4 short paragraphs max
-
-When asked about NxtStepOS: explain it's an AI operating system for independent agencies that automates emails, lead follow-up, proposals, renewals, and coverage Q&A — 24/7, accessible from any phone, no hardware needed. It's built to give agents their time back and help small agencies operate like large ones.`,
-            messages: conversationHistory
-          })
+          body: JSON.stringify({ messages: conversationHistory })
         });
 
         const data = await response.json();
         hideTyping();
 
-        const reply = data.content && data.content[0] && data.content[0].text
-          ? data.content[0].text
-          : "I'm having a moment — could you try asking that again?";
+        const reply = data.reply || "I'm having a moment — could you try asking that again?";
 
         conversationHistory.push({ role: 'assistant', content: reply });
         addMessage(reply, 'agent');
