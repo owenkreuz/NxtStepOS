@@ -59,7 +59,7 @@ export default async function handler(req, res) {
 
     if (resendKey) {
       // Step 2 — Send welcome email to the lead
-      await fetch('https://api.resend.com/emails', {
+      const welcomeResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,9 +72,11 @@ export default async function handler(req, res) {
           text: welcomeBody
         })
       });
+      const welcomeData = await welcomeResponse.json();
+      console.log('WELCOME EMAIL RESPONSE:', JSON.stringify(welcomeData));
 
       // Step 3 — Send notification email to you (the owner)
-      await fetch('https://api.resend.com/emails', {
+      const notifyResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,10 +85,14 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           from: 'NxtStepOS Leads <hello@nxtstepOS.com>',
           to: 'owenkreuzberger@gmail.com',
-          subject: `🔥 New Trial Signup — ${agency}`,
+          subject: `New Trial Signup — ${agency}`,
           text: `NEW LEAD ALERT\n\nName: ${name}\nAgency: ${agency}\nEmail: ${email}\nPhone: ${phone}\nInsurance Type: ${type}\nSubmitted: ${lead.submitted_at}\n\nFollow up within 24 hours to schedule their onboarding call.`
         })
       });
+      const notifyData = await notifyResponse.json();
+      console.log('NOTIFY EMAIL RESPONSE:', JSON.stringify(notifyData));
+    } else {
+      console.log('NO RESEND KEY FOUND');
     }
 
     return res.status(200).json({ success: true });
