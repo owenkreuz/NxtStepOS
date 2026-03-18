@@ -1,3 +1,4 @@
+// NxtStepOS Lead Capture API v2 — nxtstepos.com
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -66,7 +67,7 @@ export default async function handler(req, res) {
           'Authorization': `Bearer ${resendKey}`
         },
         body: JSON.stringify({
-          from: 'NxtStepOS <hello@nxtstepOS.com>',
+          from: 'NxtStepOS <hello@nxtstepos.com>',
           to: email,
           subject: `Welcome to NxtStepOS, ${firstName} — Your Trial Has Started`,
           text: welcomeBody
@@ -83,7 +84,7 @@ export default async function handler(req, res) {
           'Authorization': `Bearer ${resendKey}`
         },
         body: JSON.stringify({
-          from: 'NxtStepOS Leads <hello@nxtstepOS.com>',
+          from: 'NxtStepOS Leads <hello@nxtstepos.com>',
           to: 'owenkreuzberger@gmail.com',
           subject: `New Trial Signup — ${agency}`,
           text: `NEW LEAD ALERT\n\nName: ${name}\nAgency: ${agency}\nEmail: ${email}\nPhone: ${phone}\nInsurance Type: ${type}\nSubmitted: ${lead.submitted_at}\n\nFollow up within 24 hours to schedule their onboarding call.`
