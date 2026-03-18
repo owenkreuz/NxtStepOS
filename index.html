@@ -480,12 +480,39 @@
 
   <section class="cta-section" id="contact">
     <div class="cta-inner reveal">
-      <p class="section-label">Early Access</p>
+      <p class="section-label">Start Your 30-Day Free Trial</p>
       <h2 class="section-title">Be the first agency<br/>to run on <em>NxtStepOS</em></h2>
-      <p class="section-body">We're onboarding a small group of independent agencies first. Get in early, shape the product, and lock in founding pricing.</p>
-      <div class="cta-form">
-        <input type="email" class="cta-input" placeholder="Your agency email address"/>
-        <a href="#" class="btn-primary">Request Access</a>
+      <p class="section-body">No credit card required. We'll personally onboard your agency in 30 minutes. Cancel anytime — but you won't want to.</p>
+
+      <!-- Success message (hidden by default) -->
+      <div id="formSuccess" style="display:none; margin-top:40px; padding:32px; background:rgba(92,224,122,0.08); border:1px solid rgba(92,224,122,0.3); border-radius:8px;">
+        <div style="font-size:32px; margin-bottom:12px;">✅</div>
+        <h3 style="font-family:'Syne',sans-serif; font-size:22px; font-weight:800; margin-bottom:8px;">You're on the list.</h3>
+        <p style="color:var(--muted); font-size:15px;">We'll be in touch within 24 hours to schedule your onboarding call. Get ready — your agency is about to change.</p>
+      </div>
+
+      <!-- Lead capture form -->
+      <div id="leadForm" style="margin-top:40px; max-width:520px; margin-left:auto; margin-right:auto;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <input type="text" id="leadName" class="cta-input" placeholder="Your full name" />
+          <input type="text" id="leadAgency" class="cta-input" placeholder="Agency name" />
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <input type="email" id="leadEmail" class="cta-input" placeholder="Email address" />
+          <input type="tel" id="leadPhone" class="cta-input" placeholder="Phone number" />
+        </div>
+        <select id="leadType" class="cta-input" style="width:100%; margin-bottom:12px; appearance:none;">
+          <option value="" disabled selected>What type of insurance does your agency focus on?</option>
+          <option value="Commercial">Commercial</option>
+          <option value="Life">Life</option>
+          <option value="Both">Both Commercial & Life</option>
+          <option value="P&C">P&C (Auto/Home)</option>
+          <option value="Mixed">Mixed Lines</option>
+        </select>
+        <button id="submitLead" class="btn-primary" style="width:100%; justify-content:center; padding:18px;">
+          Start My Free 30-Day Trial →
+        </button>
+        <p style="font-size:11px; color:var(--muted); text-align:center; margin-top:12px; letter-spacing:0.06em;">NO CREDIT CARD · NO COMMITMENT · CANCEL ANYTIME</p>
       </div>
     </div>
   </section>
@@ -666,6 +693,47 @@
         sendMessage(chatInput.value.trim());
       }
     });
+    // ── Lead Capture Form ──
+    const submitLead = document.getElementById('submitLead');
+    if (submitLead) {
+      submitLead.addEventListener('click', async () => {
+        const name = document.getElementById('leadName').value.trim();
+        const agency = document.getElementById('leadAgency').value.trim();
+        const email = document.getElementById('leadEmail').value.trim();
+        const phone = document.getElementById('leadPhone').value.trim();
+        const type = document.getElementById('leadType').value;
+
+        if (!name || !agency || !email || !phone || !type) {
+          alert('Please fill in all fields to get started.');
+          return;
+        }
+
+        submitLead.textContent = 'Submitting...';
+        submitLead.disabled = true;
+
+        try {
+          const res = await fetch('/api/lead', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, agency, email, phone, type })
+          });
+
+          const data = await res.json();
+
+          if (data.success) {
+            document.getElementById('leadForm').style.display = 'none';
+            document.getElementById('formSuccess').style.display = 'block';
+          } else {
+            throw new Error('Submission failed');
+          }
+        } catch (err) {
+          submitLead.textContent = 'Start My Free 30-Day Trial →';
+          submitLead.disabled = false;
+          alert('Something went wrong. Please try again or email us directly.');
+        }
+      });
+    }
+
   </script>
 </body>
 </html>
