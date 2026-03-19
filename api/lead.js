@@ -15,9 +15,8 @@ export default async function handler(req, res) {
     agency,
     email,
     phone,
-    insurance_type: type,
-    status: 'new',
-    created_at: new Date().toISOString()
+    type,
+    submitted_at: new Date().toISOString()
   };
 
   console.log('NEW LEAD:', JSON.stringify(lead, null, 2));
@@ -40,14 +39,16 @@ export default async function handler(req, res) {
           'Authorization': `Bearer ${supabaseKey}`,
           'Prefer': 'return=minimal'
         },
-        body: JSON.stringify(lead)
+        body: JSON.stringify({
+          name,
+          agency,
+          email,
+          phone,
+          insurance_type: type,
+          status: 'new'
+        })
       });
-      if (dbResponse.ok) {
-        console.log('LEAD SAVED TO DATABASE');
-      } else {
-        const dbError = await dbResponse.text();
-        console.error('DATABASE ERROR:', dbError);
-      }
+      console.log('DATABASE SAVE STATUS:', dbResponse.status);
     }
 
     // Step 2 — Generate personalized welcome email with AI
@@ -80,8 +81,8 @@ export default async function handler(req, res) {
       }
     }
 
-    // Step 3 — Send emails via Resend
     if (resendKey) {
+      // Step 3 — Send welcome email to the lead
       const welcomeResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -98,6 +99,7 @@ export default async function handler(req, res) {
       const welcomeData = await welcomeResponse.json();
       console.log('WELCOME EMAIL RESPONSE:', JSON.stringify(welcomeData));
 
+      // Step 4 — Send notification email to owner
       const notifyResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -107,8 +109,8 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           from: 'NxtStepOS Leads <hello@nxtstepos.com>',
           to: 'owenkreuzberger@gmail.com',
-          subject: `🔥 New Trial Signup — ${agency}`,
-          text: `NEW LEAD ALERT\n\nName: ${name}\nAgency: ${agency}\nEmail: ${email}\nPhone: ${phone}\nInsurance Type: ${type}\nSubmitted: ${lead.created_at}\n\nFollow up within 24 hours to schedule their onboarding call.`
+          subject: `New Trial Signup — ${agency}`,
+          text: `NEW LEAD ALERT\n\nName: ${name}\nAgency: ${agency}\nEmail: ${email}\nPhone: ${phone}\nInsurance Type: ${type}\nSubmitted: ${lead.submitted_at}\n\nFollow up within 24 hours to schedule their onboarding call.`
         })
       });
       const notifyData = await notifyResponse.json();
