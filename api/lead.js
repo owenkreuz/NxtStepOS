@@ -1,4 +1,4 @@
-// NxtStepOS Lead Capture API v2 — nxtstepos.com
+// NxtStepOS Lead Capture API v3 — saves to Supabase
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -15,20 +15,42 @@ export default async function handler(req, res) {
     agency,
     email,
     phone,
-    type,
-    submitted_at: new Date().toISOString()
+    insurance_type: type,
+    status: 'new',
+    created_at: new Date().toISOString()
   };
 
   console.log('NEW LEAD:', JSON.stringify(lead, null, 2));
 
   const resendKey = process.env.RESEND_API_KEY;
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
-  // Get first name only
   const firstName = name.split(' ')[0];
 
   try {
-    // Step 1 — Generate personalized welcome email with AI
+    // Step 1 — Save lead to Supabase database
+    if (supabaseUrl && supabaseKey) {
+      const dbResponse = await fetch(`${supabaseUrl}/rest/v1/leads`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(lead)
+      });
+      if (dbResponse.ok) {
+        console.log('LEAD SAVED TO DATABASE');
+      } else {
+        const dbError = await dbResponse.text();
+        console.error('DATABASE ERROR:', dbError);
+      }
+    }
+
+    // Step 2 — Generate personalized welcome email with AI
     let welcomeBody = `Hi ${firstName},\n\nWelcome to NxtStepOS! Your 30-day free trial has officially started.\n\nWe'll be reaching out within 24 hours to schedule your personal onboarding call. In just 30 minutes we'll have your agency fully set up and running on autopilot.\n\nGet ready — your agency is about to change.\n\nThe NxtStepOS Team`;
 
     if (anthropicKey) {
@@ -58,8 +80,8 @@ export default async function handler(req, res) {
       }
     }
 
+    // Step 3 — Send emails via Resend
     if (resendKey) {
-      // Step 2 — Send welcome email to the lead
       const welcomeResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -76,7 +98,6 @@ export default async function handler(req, res) {
       const welcomeData = await welcomeResponse.json();
       console.log('WELCOME EMAIL RESPONSE:', JSON.stringify(welcomeData));
 
-      // Step 3 — Send notification email to you (the owner)
       const notifyResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -86,14 +107,12 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           from: 'NxtStepOS Leads <hello@nxtstepos.com>',
           to: 'owenkreuzberger@gmail.com',
-          subject: `New Trial Signup — ${agency}`,
-          text: `NEW LEAD ALERT\n\nName: ${name}\nAgency: ${agency}\nEmail: ${email}\nPhone: ${phone}\nInsurance Type: ${type}\nSubmitted: ${lead.submitted_at}\n\nFollow up within 24 hours to schedule their onboarding call.`
+          subject: `🔥 New Trial Signup — ${agency}`,
+          text: `NEW LEAD ALERT\n\nName: ${name}\nAgency: ${agency}\nEmail: ${email}\nPhone: ${phone}\nInsurance Type: ${type}\nSubmitted: ${lead.created_at}\n\nFollow up within 24 hours to schedule their onboarding call.`
         })
       });
       const notifyData = await notifyResponse.json();
       console.log('NOTIFY EMAIL RESPONSE:', JSON.stringify(notifyData));
-    } else {
-      console.log('NO RESEND KEY FOUND');
     }
 
     return res.status(200).json({ success: true });
