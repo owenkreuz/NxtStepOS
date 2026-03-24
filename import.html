@@ -677,7 +677,7 @@
           if (row[idx] !== undefined) obj[h] = row[idx].trim() || null;
         });
         return obj;
-      }).filter(r => r.name); // skip rows with no name
+      }).filter(r => r.first_name); // skip rows with no first_name
 
       if (records.length === 0) { skipped += batch.length; continue; }
 
