@@ -478,10 +478,12 @@
   </div>
 
   <!-- COLUMNS -->
+  <!-- FIX #1: Updated column names to match Supabase clients table (first_name / last_name instead of name) -->
   <div class="columns-card">
     <h3>Expected Columns</h3>
     <div class="columns-list">
-      <span class="col-tag required">name</span>
+      <span class="col-tag required">first_name</span>
+      <span class="col-tag required">last_name</span>
       <span class="col-tag required">email</span>
       <span class="col-tag optional">phone</span>
       <span class="col-tag optional">policy_type</span>
@@ -616,6 +618,8 @@
   function parseCSV(text) {
     const lines = text.trim().split('\n');
     return lines.map(line => {
+      // Handle Windows line endings
+      line = line.replace(/\r$/, '');
       const cols = [];
       let current = '';
       let inQuotes = false;
@@ -677,13 +681,14 @@
           if (row[idx] !== undefined) obj[h] = row[idx].trim() || null;
         });
         return obj;
-      }).filter(r => r.first_name && r.first_name.length > 0); // skip rows with no first_name
+      // FIX #2: Filter on first_name (not name) to match Supabase clients table
+      }).filter(r => r.first_name && r.first_name.trim().length > 0);
 
       if (records.length === 0) { skipped += batch.length; continue; }
 
       const { error } = await client.from('clients').insert(records);
       if (error) {
-        console.error(error);
+        console.error('Supabase insert error:', error);
         skipped += records.length;
       } else {
         imported += records.length;
@@ -707,12 +712,12 @@
     document.getElementById('resultCard').style.display = 'block';
   }
 
-  // --- TEMPLATE DOWNLOAD ---
+  // FIX #3: Template now uses first_name / last_name to match Supabase clients table
   function downloadTemplate() {
-    const csv = `name,email,phone,policy_type,renewal_date,status,notes
-John Smith,john@example.com,555-1234,Commercial Auto,2025-06-15,active,Long term client
-Jane Doe,jane@example.com,555-5678,Life Insurance,2025-08-01,active,
-Bob Johnson,bob@example.com,555-9012,General Liability,2025-07-20,active,Referred by John`;
+    const csv = `first_name,last_name,email,phone,policy_type,renewal_date,status,notes
+John,Smith,john@example.com,555-1234,Commercial Auto,2025-06-15,active,Long term client
+Jane,Doe,jane@example.com,555-5678,Life Insurance,2025-08-01,active,
+Bob,Johnson,bob@example.com,555-9012,General Liability,2025-07-20,active,Referred by John`;
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
