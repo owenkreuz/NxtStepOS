@@ -712,13 +712,17 @@
     document.getElementById('resultCard').style.display = 'block';
   }
 
-  // FIX #3: Template now uses first_name / last_name to match Supabase clients table
+  // FIX #3: Template uses first_name/last_name, clean line endings, BOM for Excel compatibility
   function downloadTemplate() {
-    const csv = `first_name,last_name,email,phone,policy_type,renewal_date,status,notes
-John,Smith,john@example.com,555-1234,Commercial Auto,2025-06-15,active,Long term client
-Jane,Doe,jane@example.com,555-5678,Life Insurance,2025-08-01,active,
-Bob,Johnson,bob@example.com,555-9012,General Liability,2025-07-20,active,Referred by John`;
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const rows = [
+      ['first_name', 'last_name', 'email', 'phone', 'policy_type', 'renewal_date', 'status', 'notes'],
+      ['John', 'Smith', 'john@example.com', '555-1234', 'Commercial Auto', '2025-06-15', 'active', 'Long term client'],
+      ['Jane', 'Doe', 'jane@example.com', '555-5678', 'Life Insurance', '2025-08-01', 'active', ''],
+      ['Bob', 'Johnson', 'bob@example.com', '555-9012', 'General Liability', '2025-07-20', 'active', 'Referred by John'],
+    ];
+    // Join with \r\n (standard CSV line endings) and add BOM so Excel opens it cleanly
+    const csv = '\uFEFF' + rows.map(r => r.join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
