@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NxtStepOS — Import Clients</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1a1a24;
+      --border: #1e1e2e;
+      --accent: #4f6ef7;
+      --accent-glow: rgba(79,110,247,0.2);
+      --green: #34d399;
+      --yellow: #fbbf24;
+      --red: #f87171;
+      --text: #eeeef2;
+      --muted: #6b6b80;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(79,110,247,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,110,247,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: var(--accent); }
+
+    .back-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .back-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    .page-header {
+      margin-bottom: 36px;
+      animation: fadeUp 0.4s ease forwards;
+    }
+
+    .page-header h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .page-header p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* TEMPLATE DOWNLOAD */
+    .template-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      animation: fadeUp 0.4s ease 0.1s both;
+    }
+
+    .template-info h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .template-info p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .template-btn {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .template-btn:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* COLUMNS INFO */
+    .columns-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.4s ease 0.15s both;
+    }
+
+    .columns-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .columns-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .col-tag {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-family: 'DM Sans', monospace;
+      color: var(--accent);
+    }
+
+    .col-tag.required {
+      border-color: rgba(79,110,247,0.4);
+    }
+
+    .col-tag.optional {
+      color: var(--muted);
+    }
+
+    /* DROP ZONE */
+    .drop-zone {
+      background: var(--surface);
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      animation: fadeUp 0.4s ease 0.2s both;
+      position: relative;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(79,110,247,0.04);
+    }
+
+    .drop-icon {
+      font-size: 40px;
+      margin-bottom: 14px;
+    }
+
+    .drop-zone h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .drop-zone p {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .file-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      transition: opacity 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .file-btn:hover { opacity: 0.9; }
+
+    #fileInput { display: none; }
+
+    /* PREVIEW */
+    .preview-section {
+      display: none;
+      margin-top: 24px;
+      animation: fadeUp 0.3s ease forwards;
+    }
+
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .preview-header h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .preview-meta {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 500px;
+    }
+
+    thead th {
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      background: var(--surface2);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody td {
+      padding: 11px 16px;
+      color: var(--text);
+    }
+
+    /* IMPORT BTN */
+    .import-btn {
+      width: 100%;
+      background: var(--green);
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      box-shadow: 0 4px 20px rgba(52,211,153,0.25);
+    }
+
+    .import-btn:hover { opacity: 0.9; }
+    .import-btn:active { transform: scale(0.99); }
+    .import-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* PROGRESS */
+    .progress-wrap {
+      display: none;
+      margin-top: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .progress-label {
+      font-size: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .progress-bar-bg {
+      background: var(--border);
+      border-radius: 99px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      background: var(--green);
+      height: 100%;
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 10px rgba(52,211,153,0.4);
+    }
+
+    /* RESULT */
+    .result-card {
+      display: none;
+      margin-top: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      animation: fadeUp 0.3s ease forwards;
+    }
+
+    .result-icon { font-size: 48px; margin-bottom: 12px; }
+
+    .result-card h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .result-card p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+
+    .result-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .result-stat { text-align: center; }
+
+    .result-stat .num {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    .result-stat .lbl {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .dash-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 28px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .error-msg {
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.25);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--red);
+      margin-top: 16px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Nxt<span>Step</span>OS</div>
+  <a href="/dashboard.html" class="back-btn">← Back to Dashboard</a>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Import Clients</h1>
+    <p>Upload a CSV file to bring your existing clients into NxtStepOS in one shot. Works with Excel exports, Google Sheets, and any CSV file.</p>
+  </div>
+
+  <!-- TEMPLATE -->
+  <div class="template-card">
+    <div class="template-info">
+      <h3>📄 Download CSV Template</h3>
+      <p>Not sure about the format? Download this template and fill it in.</p>
+    </div>
+    <button class="template-btn" onclick="downloadTemplate()">Download Template</button>
+  </div>
+
+  <!-- COLUMNS -->
+  <div class="columns-card">
+    <h3>Expected Columns</h3>
+    <div class="columns-list">
+      <span class="col-tag required">name</span>
+      <span class="col-tag required">email</span>
+      <span class="col-tag optional">phone</span>
+      <span class="col-tag optional">policy_type</span>
+      <span class="col-tag optional">renewal_date</span>
+      <span class="col-tag optional">status</span>
+      <span class="col-tag optional">notes</span>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:12px;"><span style="color:var(--accent)">Blue</span> = required &nbsp;·&nbsp; <span style="color:var(--muted)">Grey</span> = optional &nbsp;·&nbsp; Column names must match exactly (lowercase)</p>
+  </div>
+
+  <!-- DROP ZONE -->
+  <div class="drop-zone" id="dropZone"
+    ondragover="handleDragOver(event)"
+    ondragleave="handleDragLeave(event)"
+    ondrop="handleDrop(event)"
+    onclick="document.getElementById('fileInput').click()">
+    <div class="drop-icon">📂</div>
+    <h2>Drop your CSV here</h2>
+    <p>or click to browse your files</p>
+    <button class="file-btn" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">Choose CSV File</button>
+    <input type="file" id="fileInput" accept=".csv" onchange="handleFileSelect(event)" />
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <!-- PREVIEW -->
+  <div class="preview-section" id="previewSection">
+    <div class="preview-header">
+      <h3 id="previewTitle">Preview</h3>
+      <span class="preview-meta" id="previewMeta"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead id="previewHead"></thead>
+        <tbody id="previewBody"></tbody>
+      </table>
+    </div>
+    <button class="import-btn" id="importBtn" onclick="runImport()">⬆ Import All Clients</button>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-label">
+        <span id="progressText">Importing...</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-card" id="resultCard">
+    <div class="result-icon">🎉</div>
+    <h2>Import Complete!</h2>
+    <p>Your clients have been added to NxtStepOS.</p>
+    <div class="result-stats">
+      <div class="result-stat">
+        <div class="num" id="resultImported">0</div>
+        <div class="lbl">Imported</div>
+      </div>
+      <div class="result-stat">
+        <div class="num" id="resultSkipped" style="color:var(--yellow)">0</div>
+        <div class="lbl">Skipped</div>
+      </div>
+    </div>
+    <a href="/dashboard.html" class="dash-btn">Go to Dashboard</a>
+  </div>
+
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vjdjtsfjjibhjufxggid.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqZGp0c2ZqamliaGp1ZnhnZ2lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NzI2NjQsImV4cCI6MjA4OTQ0ODY2NH0.eLAtNfyjGrGSKexRZ_N-RDL_u5QFlgZjbGpAfAlVmiA';
+
+  const { createClient } = supabase;
+  const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let parsedRows = [];
+
+  // --- AUTH CHECK ---
+  async function init() {
+    const { data: { session } } = await client.auth.getSession();
+    if (!session) {
+      window.location.href = '/login.html';
+    }
+  }
+
+  // --- DRAG & DROP ---
+  function handleDragOver(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.add('dragover');
+  }
+
+  function handleDragLeave(e) {
+    document.getElementById('dropZone').classList.remove('dragover');
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
+  }
+
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) processFile(file);
+  }
+
+  // --- PARSE CSV ---
+  function processFile(file) {
+    hideError();
+    if (!file.name.endsWith('.csv')) {
+      showError('Please upload a .csv file.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target.result;
+      const rows = parseCSV(text);
+      if (rows.length < 2) {
+        showError('CSV appears to be empty or invalid.');
+        return;
+      }
+      parsedRows = rows;
+      showPreview(rows);
+    };
+    reader.readAsText(file);
+  }
+
+  function parseCSV(text) {
+    const lines = text.trim().split('\n');
+    return lines.map(line => {
+      const cols = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') { inQuotes = !inQuotes; }
+        else if (ch === ',' && !inQuotes) { cols.push(current.trim()); current = ''; }
+        else { current += ch; }
+      }
+      cols.push(current.trim());
+      return cols;
+    });
+  }
+
+  // --- PREVIEW ---
+  function showPreview(rows) {
+    const headers = rows[0].map(h => h.toLowerCase().trim());
+    const dataRows = rows.slice(1).filter(r => r.some(c => c.trim()));
+
+    document.getElementById('previewTitle').textContent = `Preview — ${dataRows.length} clients found`;
+    document.getElementById('previewMeta').textContent = `Showing first 5 rows`;
+
+    // Headers
+    document.getElementById('previewHead').innerHTML =
+      '<tr>' + headers.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>';
+
+    // First 5 rows
+    document.getElementById('previewBody').innerHTML = dataRows.slice(0, 5).map(row =>
+      '<tr>' + row.map(cell => `<td>${esc(cell)}</td>`).join('') + '</tr>'
+    ).join('');
+
+    document.getElementById('previewSection').style.display = 'block';
+    document.getElementById('importBtn').textContent = `⬆ Import All ${dataRows.length} Clients`;
+  }
+
+  // --- IMPORT ---
+  async function runImport() {
+    const headers = parsedRows[0].map(h => h.toLowerCase().trim());
+    const dataRows = parsedRows.slice(1).filter(r => r.some(c => c.trim()));
+
+    const btn = document.getElementById('importBtn');
+    btn.disabled = true;
+
+    document.getElementById('progressWrap').style.display = 'block';
+
+    const { data: { session } } = await client.auth.getSession();
+    const agencyId = session?.user?.id;
+
+    let imported = 0;
+    let skipped = 0;
+    const batchSize = 50;
+
+    for (let i = 0; i < dataRows.length; i += batchSize) {
+      const batch = dataRows.slice(i, i + batchSize);
+
+      const records = batch.map(row => {
+        const obj = { agency_id: agencyId, status: 'active' };
+        headers.forEach((h, idx) => {
+          if (row[idx] !== undefined) obj[h] = row[idx].trim() || null;
+        });
+        return obj;
+      }).filter(r => r.name); // skip rows with no name
+
+      if (records.length === 0) { skipped += batch.length; continue; }
+
+      const { error } = await client.from('clients').insert(records);
+      if (error) {
+        console.error(error);
+        skipped += records.length;
+      } else {
+        imported += records.length;
+      }
+
+      // Update progress
+      const pct = Math.round(((i + batch.length) / dataRows.length) * 100);
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressPct').textContent = pct + '%';
+      document.getElementById('progressText').textContent = `Importing ${Math.min(i + batchSize, dataRows.length)} of ${dataRows.length}...`;
+
+      // Small delay to avoid rate limits
+      await new Promise(r => setTimeout(r, 100));
+    }
+
+    // Show result
+    document.getElementById('progressWrap').style.display = 'none';
+    document.getElementById('previewSection').style.display = 'none';
+    document.getElementById('resultImported').textContent = imported;
+    document.getElementById('resultSkipped').textContent = skipped;
+    document.getElementById('resultCard').style.display = 'block';
+  }
+
+  // --- TEMPLATE DOWNLOAD ---
+  function downloadTemplate() {
+    const csv = `name,email,phone,policy_type,renewal_date,status,notes
+John Smith,john@example.com,555-1234,Commercial Auto,2025-06-15,active,Long term client
+Jane Doe,jane@example.com,555-5678,Life Insurance,2025-08-01,active,
+Bob Johnson,bob@example.com,555-9012,General Liability,2025-07-20,active,Referred by John`;
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'nxtstepOS_client_template.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function hideError() {
+    document.getElementById('errorMsg').style.display = 'none';
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  init();
+</script>
+</body>
+</html>
