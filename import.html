@@ -106,9 +106,12 @@
 </head>
 <body>
 
-  <div style="max-width:860px;margin:0 auto 20px;">
-    <h1>Import Clients</h1>
-    <p class="subtitle">Upload a CSV to import clients into NxtStepOS. Errors appear per row.</p>
+  <div style="max-width:860px;margin:0 auto 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+    <div>
+      <h1>Import Clients</h1>
+      <p class="subtitle">Upload a CSV to import clients into NxtStepOS. Errors appear per row.</p>
+    </div>
+    <button id="exportBtn" style="margin-top:6px;background:#1e1e1e;color:#e5e5e5;border:1px solid #333;white-space:nowrap;">Export CSV</button>
   </div>
 
   <div class="card">
@@ -353,6 +356,53 @@
 
     return record;
   }
+
+  // ── Export ─────────────────────────────────────────────────────────────────
+  const EXPORT_COLS = ['first_name','last_name','email','phone','policy_type','renewal_date','status','notes','agency_id'];
+
+  document.getElementById('exportBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('exportBtn');
+    btn.disabled = true;
+    btn.textContent = 'Exporting…';
+
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/clients?select=${EXPORT_COLS.join(',')}&order=last_name.asc,first_name.asc&limit=10000`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+      );
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        alert(`Export failed: ${body.message || 'HTTP ' + res.status}`);
+        return;
+      }
+
+      const clients = await res.json();
+      if (clients.length === 0) { alert('No clients found.'); return; }
+
+      const csvRows = [EXPORT_COLS.join(',')];
+      for (const c of clients) {
+        csvRows.push(EXPORT_COLS.map(col => {
+          const val = c[col] == null ? '' : String(c[col]);
+          return val.includes(',') || val.includes('"') || val.includes('\n')
+            ? `"${val.replace(/"/g, '""')}"` : val;
+        }).join(','));
+      }
+
+      const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `clients_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(`Export error: ${err.message}`);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Export CSV';
+    }
+  });
 
   function escHtml(s) {
     return String(s)
