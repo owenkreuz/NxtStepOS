@@ -97,9 +97,10 @@
       font-size: 0.75rem;
       font-weight: 600;
     }
-    .badge.ok      { background: #052e16; color: #86efac; }
-    .badge.skipped { background: #1c1002; color: #fde047; }
-    .badge.fail    { background: #1f0606; color: #fca5a5; }
+    .badge.ok        { background: #052e16; color: #86efac; }
+    .badge.skipped   { background: #1c1002; color: #fde047; }
+    .badge.fail      { background: #1f0606; color: #fca5a5; }
+    .badge.duplicate { background: #12101e; color: #a78bfa; }
     .err-msg { color: #f87171; margin-top: 3px; font-size: 0.78rem; word-break: break-word; }
   </style>
 </head>
@@ -156,7 +157,7 @@
       statusEl.innerHTML = `<div class="summary info">Parsed <strong>${rows.length}</strong> row(s). Importing…</div>`;
 
       const results = [];
-      let ok = 0, skipped = 0, failed = 0;
+      let ok = 0, skipped = 0, dupes = 0, failed = 0;
 
       for (let i = 0; i < rows.length; i++) {
         const raw = rows[i];
@@ -177,6 +178,20 @@
           });
           skipped++;
           continue;
+        }
+
+        // Duplicate check — query by first_name + last_name
+        const dupeCheck = await fetch(
+          `${SUPABASE_URL}/rest/v1/clients?first_name=eq.${encodeURIComponent(record.first_name)}&last_name=eq.${encodeURIComponent(record.last_name)}&select=id&limit=1`,
+          { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+        );
+        if (dupeCheck.ok) {
+          const existing = await dupeCheck.json();
+          if (existing.length > 0) {
+            results.push({ row: i + 2, status: 'duplicate', label: `${record.first_name} ${record.last_name}`, reason: 'Already exists in database' });
+            dupes++;
+            continue;
+          }
         }
 
         // Build clean record with only known columns
@@ -230,10 +245,11 @@
       // Summary banner
       let bannerClass = 'success';
       if (failed > 0 && ok === 0) bannerClass = 'error';
-      else if (failed > 0 || skipped > 0) bannerClass = 'warning';
+      else if (failed > 0 || skipped > 0 || dupes > 0) bannerClass = 'warning';
 
       let html = `<div class="summary ${bannerClass}">
         <strong>${ok}</strong> imported &nbsp;·&nbsp;
+        <strong>${dupes}</strong> duplicate${dupes !== 1 ? 's' : ''} &nbsp;·&nbsp;
         <strong>${skipped}</strong> skipped &nbsp;·&nbsp;
         <strong>${failed}</strong> failed
       </div>`;
@@ -244,8 +260,8 @@
         </tr></thead><tbody>`;
 
       for (const r of results) {
-        const badgeClass = r.status === 'ok' ? 'ok' : r.status === 'skipped' ? 'skipped' : 'fail';
-        const badgeLabel = r.status === 'ok' ? 'Imported' : r.status === 'skipped' ? 'Skipped' : 'Failed';
+        const badgeClass = r.status === 'ok' ? 'ok' : r.status === 'skipped' ? 'skipped' : r.status === 'duplicate' ? 'duplicate' : 'fail';
+        const badgeLabel = r.status === 'ok' ? 'Imported' : r.status === 'skipped' ? 'Skipped' : r.status === 'duplicate' ? 'Duplicate' : 'Failed';
         const detail = r.reason ? `<div class="err-msg">${escHtml(r.reason)}</div>` : '';
         html += `<tr>
           <td>${r.row}</td>
