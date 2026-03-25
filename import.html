@@ -102,6 +102,36 @@
     .badge.fail      { background: #1f0606; color: #fca5a5; }
     .badge.duplicate { background: #12101e; color: #a78bfa; }
     .err-msg { color: #f87171; margin-top: 3px; font-size: 0.78rem; word-break: break-word; }
+
+    #search-section { max-width: 860px; margin: 0 auto 24px; }
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .search-bar input[type="text"] {
+      flex: 1;
+      padding: 11px 14px;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #e5e5e5;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .search-bar input[type="text"]:focus { border-color: #c9a84c; }
+    .search-bar select {
+      padding: 11px 14px;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #e5e5e5;
+      font-size: 0.9rem;
+      outline: none;
+      cursor: pointer;
+    }
+    .search-bar select:focus { border-color: #c9a84c; }
+    #client-count { color: #666; font-size: 0.8rem; margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -123,6 +153,22 @@
       Common aliases are recognised (e.g. "First Name", "Last Name", "name", "Email Address").
     </p>
     <button id="importBtn" disabled>Import Clients</button>
+  </div>
+
+  <div id="search-section">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by name, email, phone…" />
+      <select id="statusFilter">
+        <option value="">All statuses</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+      <select id="policyFilter">
+        <option value="">All policy types</option>
+      </select>
+    </div>
+    <div id="client-count"></div>
+    <div id="client-table"></div>
   </div>
 
   <div id="status"></div>
@@ -356,6 +402,87 @@
 
     return record;
   }
+
+  // ── Client search / filter ─────────────────────────────────────────────────
+  let allClients = [];
+
+  async function loadClients() {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/clients?select=${EXPORT_COLS.join(',')}&order=last_name.asc,first_name.asc&limit=10000`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
+    if (!res.ok) return;
+    allClients = await res.json();
+
+    // Populate policy type filter from actual data
+    const types = [...new Set(allClients.map(c => c.policy_type).filter(Boolean))].sort();
+    const policyFilter = document.getElementById('policyFilter');
+    types.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t; opt.textContent = t;
+      policyFilter.appendChild(opt);
+    });
+
+    renderClients();
+  }
+
+  function renderClients() {
+    const q      = document.getElementById('searchInput').value.toLowerCase().trim();
+    const status = document.getElementById('statusFilter').value;
+    const policy = document.getElementById('policyFilter').value;
+
+    const filtered = allClients.filter(c => {
+      if (status && c.status !== status) return false;
+      if (policy && c.policy_type !== policy) return false;
+      if (q) {
+        const haystack = [c.first_name, c.last_name, c.email, c.phone].join(' ').toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      return true;
+    });
+
+    document.getElementById('client-count').textContent =
+      `${filtered.length} client${filtered.length !== 1 ? 's' : ''}${allClients.length !== filtered.length ? ` of ${allClients.length}` : ''}`;
+
+    if (filtered.length === 0) {
+      document.getElementById('client-table').innerHTML =
+        '<p style="color:#666;font-size:0.85rem;padding:12px 0;">No clients match.</p>';
+      return;
+    }
+
+    let html = `<table><thead><tr>
+      <th>Name</th><th>Email</th><th>Phone</th><th>Policy Type</th><th>Renewal</th><th>Status</th>
+    </tr></thead><tbody>`;
+
+    for (const c of filtered) {
+      const statusBadge = c.status === 'active'
+        ? '<span class="badge ok">Active</span>'
+        : c.status === 'inactive'
+          ? '<span class="badge skipped">Inactive</span>'
+          : escHtml(c.status || '—');
+      html += `<tr>
+        <td>${escHtml((c.first_name || '') + ' ' + (c.last_name || ''))}</td>
+        <td>${escHtml(c.email || '—')}</td>
+        <td>${escHtml(c.phone || '—')}</td>
+        <td>${escHtml(c.policy_type || '—')}</td>
+        <td>${escHtml(c.renewal_date || '—')}</td>
+        <td>${statusBadge}</td>
+      </tr>`;
+    }
+
+    html += '</tbody></table>';
+    document.getElementById('client-table').innerHTML = html;
+  }
+
+  document.getElementById('searchInput').addEventListener('input', renderClients);
+  document.getElementById('statusFilter').addEventListener('change', renderClients);
+  document.getElementById('policyFilter').addEventListener('change', renderClients);
+
+  // Reload client list after a successful import
+  const _origImportBtn = document.getElementById('importBtn');
+  _origImportBtn.addEventListener('click', () => setTimeout(loadClients, 3000));
+
+  loadClients();
 
   // ── Export ─────────────────────────────────────────────────────────────────
   const EXPORT_COLS = ['first_name','last_name','email','phone','policy_type','renewal_date','status','notes','agency_id'];
