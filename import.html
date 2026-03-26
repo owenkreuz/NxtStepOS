@@ -144,6 +144,26 @@
     }
     .search-bar select:focus { border-color: #c9a84c; }
     #client-count { color: #666; font-size: 0.8rem; margin-bottom: 10px; }
+    .clear-btn {
+      padding: 11px 14px;
+      background: transparent;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #888;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 0;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+    .clear-btn:hover { border-color: #c9a84c; color: #c9a84c; }
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { color: #e5e5e5; }
+    th .sort-arrow { margin-left: 4px; color: #555; font-size: 0.7rem; }
+    th.sort-asc .sort-arrow::after  { content: '▲'; color: #c9a84c; }
+    th.sort-desc .sort-arrow::after { content: '▼'; color: #c9a84c; }
+    th:not(.sort-asc):not(.sort-desc) .sort-arrow::after { content: '⇅'; }
+    .renewal-warning { color: #fbbf24; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -178,6 +198,7 @@
       <select id="policyFilter">
         <option value="">All policy types</option>
       </select>
+      <button class="clear-btn" id="clearBtn">Clear</button>
     </div>
     <div id="client-count"></div>
     <div id="client-table"></div>
@@ -421,6 +442,7 @@
 
   // ── Client search / filter ─────────────────────────────────────────────────
   let allClients = [];
+  let sortCol = 'last_name', sortDir = 'asc';
 
   async function loadClients() {
     const countEl = document.getElementById('client-count');
@@ -483,15 +505,36 @@
     document.getElementById('client-count').textContent =
       `${allClients.length} client${allClients.length !== 1 ? 's' : ''} · ${active} active · ${inactive} inactive${showing}`;
 
+    // Sort
+    filtered.sort((a, b) => {
+      const av = (a[sortCol] || '').toLowerCase();
+      const bv = (b[sortCol] || '').toLowerCase();
+      return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+    });
+
     if (filtered.length === 0) {
       document.getElementById('client-table').innerHTML =
         '<p style="color:#666;font-size:0.85rem;padding:12px 0;">No clients match.</p>';
       return;
     }
 
-    let html = `<table><thead><tr>
-      <th>Name</th><th>Email</th><th>Phone</th><th>Policy Type</th><th>Renewal</th><th>Status</th><th></th>
-    </tr></thead><tbody>`;
+    const cols = [
+      { label: 'Name',        key: 'last_name'    },
+      { label: 'Email',       key: 'email'        },
+      { label: 'Phone',       key: 'phone'        },
+      { label: 'Policy Type', key: 'policy_type'  },
+      { label: 'Renewal',     key: 'renewal_date' },
+      { label: 'Status',      key: 'status'       },
+    ];
+    const headers = cols.map(col => {
+      const cls = sortCol === col.key ? `sortable sort-${sortDir}` : 'sortable';
+      return `<th class="${cls}" data-col="${col.key}">${col.label}<span class="sort-arrow"></span></th>`;
+    }).join('') + '<th></th>';
+
+    let html = `<table><thead><tr>${headers}</tr></thead><tbody>`;
+
+    const today    = new Date();
+    const in30days = new Date(today); in30days.setDate(today.getDate() + 30);
 
     for (const c of filtered) {
       const statusBadge = c.status === 'active'
@@ -499,12 +542,22 @@
         : c.status === 'inactive'
           ? '<span class="badge skipped">Inactive</span>'
           : escHtml(c.status || '—');
+
+      // Renewal alert — highlight if within 30 days
+      let renewalDisplay = escHtml(c.renewal_date || '—');
+      if (c.renewal_date) {
+        const rd = new Date(c.renewal_date);
+        if (rd >= today && rd <= in30days) {
+          renewalDisplay = `<span class="renewal-warning" title="Renewing within 30 days">⚠ ${escHtml(c.renewal_date)}</span>`;
+        }
+      }
+
       html += `<tr data-id="${c.id}">
         <td>${escHtml((c.first_name || '') + ' ' + (c.last_name || ''))}</td>
         <td>${escHtml(c.email || '—')}</td>
         <td>${escHtml(c.phone || '—')}</td>
         <td>${escHtml(c.policy_type || '—')}</td>
-        <td>${escHtml(c.renewal_date || '—')}</td>
+        <td>${renewalDisplay}</td>
         <td>${statusBadge}</td>
         <td><button class="del-btn" data-id="${c.id}" title="Delete client">✕</button></td>
       </tr>`;
@@ -545,6 +598,22 @@
   document.getElementById('searchInput').addEventListener('input', renderClients);
   document.getElementById('statusFilter').addEventListener('change', renderClients);
   document.getElementById('policyFilter').addEventListener('change', renderClients);
+
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('policyFilter').value = '';
+    renderClients();
+  });
+
+  document.getElementById('client-table').addEventListener('click', e => {
+    const th = e.target.closest('th.sortable');
+    if (!th) return;
+    const col = th.dataset.col;
+    if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    else { sortCol = col; sortDir = 'asc'; }
+    renderClients();
+  });
 
   // Reload client list after a successful import
   const _origImportBtn = document.getElementById('importBtn');
