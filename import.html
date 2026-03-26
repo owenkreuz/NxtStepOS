@@ -403,6 +403,9 @@
     return record;
   }
 
+  // ── Shared config ──────────────────────────────────────────────────────────
+  const EXPORT_COLS = ['first_name','last_name','email','phone','policy_type','renewal_date','status','notes','agency_id'];
+
   // ── Client search / filter ─────────────────────────────────────────────────
   let allClients = [];
 
@@ -485,8 +488,6 @@
   loadClients();
 
   // ── Export ─────────────────────────────────────────────────────────────────
-  const EXPORT_COLS = ['first_name','last_name','email','phone','policy_type','renewal_date','status','notes','agency_id'];
-
   document.getElementById('exportBtn').addEventListener('click', async () => {
     const btn = document.getElementById('exportBtn');
     btn.disabled = true;
