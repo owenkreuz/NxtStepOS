@@ -477,8 +477,11 @@
       return true;
     });
 
+    const active   = allClients.filter(c => c.status === 'active').length;
+    const inactive = allClients.filter(c => c.status === 'inactive').length;
+    const showing  = filtered.length !== allClients.length ? ` · showing ${filtered.length}` : '';
     document.getElementById('client-count').textContent =
-      `${filtered.length} client${filtered.length !== 1 ? 's' : ''}${allClients.length !== filtered.length ? ` of ${allClients.length}` : ''}`;
+      `${allClients.length} client${allClients.length !== 1 ? 's' : ''} · ${active} active · ${inactive} inactive${showing}`;
 
     if (filtered.length === 0) {
       document.getElementById('client-table').innerHTML =
