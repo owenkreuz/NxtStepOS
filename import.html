@@ -102,6 +102,18 @@
     .badge.fail      { background: #1f0606; color: #fca5a5; }
     .badge.duplicate { background: #12101e; color: #a78bfa; }
     .err-msg { color: #f87171; margin-top: 3px; font-size: 0.78rem; word-break: break-word; }
+    .del-btn {
+      margin-top: 0;
+      padding: 3px 8px;
+      background: transparent;
+      border: 1px solid #3a1a1a;
+      color: #f87171;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      letter-spacing: 0;
+    }
+    .del-btn:hover { background: #1f0606; border-color: #f87171; }
 
     #search-section { max-width: 860px; margin: 0 auto 24px; }
     .search-bar {
@@ -405,21 +417,42 @@
 
   // ── Shared config ──────────────────────────────────────────────────────────
   const EXPORT_COLS = ['first_name','last_name','email','phone','policy_type','renewal_date','status','notes','agency_id'];
+  const FETCH_COLS  = ['id', ...EXPORT_COLS];
 
   // ── Client search / filter ─────────────────────────────────────────────────
   let allClients = [];
 
   async function loadClients() {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/clients?select=${EXPORT_COLS.join(',')}&order=last_name.asc,first_name.asc&limit=10000`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
-    );
-    if (!res.ok) return;
+    const countEl = document.getElementById('client-count');
+    const tableEl = document.getElementById('client-table');
+    countEl.textContent = 'Loading…';
+    tableEl.innerHTML = '';
+
+    let res;
+    try {
+      res = await fetch(
+        `${SUPABASE_URL}/rest/v1/clients?select=${FETCH_COLS.join(',')}&order=last_name.asc,first_name.asc&limit=10000`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+      );
+    } catch (err) {
+      countEl.textContent = '';
+      tableEl.innerHTML = `<p style="color:#f87171;font-size:0.85rem;padding:12px 0;">Network error: ${escHtml(err.message)}</p>`;
+      return;
+    }
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      countEl.textContent = '';
+      tableEl.innerHTML = `<p style="color:#f87171;font-size:0.85rem;padding:12px 0;">Failed to load clients: ${escHtml(body.message || 'HTTP ' + res.status)}</p>`;
+      return;
+    }
+
     allClients = await res.json();
 
-    // Populate policy type filter from actual data
-    const types = [...new Set(allClients.map(c => c.policy_type).filter(Boolean))].sort();
+    // Repopulate policy type filter (clear first to avoid duplicates on reload)
     const policyFilter = document.getElementById('policyFilter');
+    policyFilter.innerHTML = '<option value="">All policy types</option>';
+    const types = [...new Set(allClients.map(c => c.policy_type).filter(Boolean))].sort();
     types.forEach(t => {
       const opt = document.createElement('option');
       opt.value = t; opt.textContent = t;
@@ -454,7 +487,7 @@
     }
 
     let html = `<table><thead><tr>
-      <th>Name</th><th>Email</th><th>Phone</th><th>Policy Type</th><th>Renewal</th><th>Status</th>
+      <th>Name</th><th>Email</th><th>Phone</th><th>Policy Type</th><th>Renewal</th><th>Status</th><th></th>
     </tr></thead><tbody>`;
 
     for (const c of filtered) {
@@ -463,18 +496,47 @@
         : c.status === 'inactive'
           ? '<span class="badge skipped">Inactive</span>'
           : escHtml(c.status || '—');
-      html += `<tr>
+      html += `<tr data-id="${c.id}">
         <td>${escHtml((c.first_name || '') + ' ' + (c.last_name || ''))}</td>
         <td>${escHtml(c.email || '—')}</td>
         <td>${escHtml(c.phone || '—')}</td>
         <td>${escHtml(c.policy_type || '—')}</td>
         <td>${escHtml(c.renewal_date || '—')}</td>
         <td>${statusBadge}</td>
+        <td><button class="del-btn" data-id="${c.id}" title="Delete client">✕</button></td>
       </tr>`;
     }
 
     html += '</tbody></table>';
     document.getElementById('client-table').innerHTML = html;
+
+    // Wire up delete buttons
+    document.querySelectorAll('.del-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const row = btn.closest('tr');
+        const name = row.querySelector('td').textContent;
+        if (!confirm(`Delete ${name}?`)) return;
+
+        btn.disabled = true;
+        btn.textContent = '…';
+
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/clients?id=eq.${id}`, {
+          method: 'DELETE',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+
+        if (res.ok) {
+          allClients = allClients.filter(c => String(c.id) !== String(id));
+          renderClients();
+        } else {
+          const body = await res.json().catch(() => ({}));
+          alert(`Delete failed: ${body.message || 'HTTP ' + res.status}`);
+          btn.disabled = false;
+          btn.textContent = '✕';
+        }
+      });
+    });
   }
 
   document.getElementById('searchInput').addEventListener('input', renderClients);
