@@ -660,11 +660,11 @@
     // Clients table
     const tbody = document.getElementById('clientsBody');
     if (data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">👥</div>No clients yet. Import a CSV in Phase 9!</div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">👥</div>No clients yet. Import one at /import.html</div></td></tr>`;
     } else {
       tbody.innerHTML = data.map(c => `
         <tr>
-          <td><strong>${esc(c.name)}</strong></td>
+          <td><strong>${esc((c.first_name || '') + ' ' + (c.last_name || ''))}</strong></td>
           <td><a href="mailto:${esc(c.email)}" style="color:var(--accent);text-decoration:none;">${esc(c.email || '—')}</a></td>
           <td>${esc(c.phone || '—')}</td>
           <td>${esc(c.policy_type || '—')}</td>
@@ -686,7 +686,7 @@
           return `
             <div class="renewal-item">
               <div>
-                <div class="renewal-name">${esc(c.name)}</div>
+                <div class="renewal-name">${esc((c.first_name || '') + ' ' + (c.last_name || ''))}</div>
                 <div class="renewal-detail">${esc(c.policy_type || 'Policy')} · ${esc(c.email || '')}</div>
               </div>
               <div style="text-align:right;">
