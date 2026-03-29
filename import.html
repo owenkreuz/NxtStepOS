@@ -164,6 +164,70 @@
     th.sort-desc .sort-arrow::after { content: '▼'; color: #c9a84c; }
     th:not(.sort-asc):not(.sort-desc) .sort-arrow::after { content: '⇅'; }
     .renewal-warning { color: #fbbf24; font-weight: 600; }
+    .edit-btn {
+      margin-top: 0; padding: 3px 8px;
+      background: transparent; border: 1px solid #1a2e1a;
+      color: #86efac; border-radius: 4px; font-size: 0.75rem;
+      cursor: pointer; letter-spacing: 0; margin-right: 4px;
+    }
+    .edit-btn:hover { background: #052e16; border-color: #86efac; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #141414; border: 1px solid #333;
+      border-radius: 12px; padding: 28px; width: 100%;
+      max-width: 520px; margin: 20px;
+    }
+    .modal h2 { font-size: 1.1rem; margin-bottom: 20px; }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .modal-grid .full { grid-column: 1 / -1; }
+    .modal label { font-size: 0.8rem; color: #aaa; margin-bottom: 4px; display: block; }
+    .modal input, .modal select {
+      width: 100%; padding: 9px 12px;
+      background: #1e1e1e; border: 1px solid #333;
+      border-radius: 7px; color: #e5e5e5; font-size: 0.88rem; outline: none;
+    }
+    .modal input:focus, .modal select:focus { border-color: #c9a84c; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .modal-actions .cancel-btn {
+      margin-top: 0; background: transparent; border: 1px solid #333;
+      color: #888; padding: 9px 20px; font-size: 0.88rem; letter-spacing: 0;
+    }
+    .modal-actions .cancel-btn:hover { border-color: #555; color: #e5e5e5; }
+    .modal-actions .save-btn { margin-top: 0; padding: 9px 20px; font-size: 0.88rem; }
+    .modal-err { color: #f87171; font-size: 0.8rem; margin-top: 10px; }
+
+    /* Renewal dashboard */
+    #renewal-section { max-width: 860px; margin: 0 auto 32px; }
+    .renewal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; cursor: pointer; user-select: none;
+    }
+    .renewal-header h2 { font-size: 1rem; font-weight: 600; }
+    .renewal-header .toggle { color: #666; font-size: 0.8rem; }
+    .renewal-bands { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .renewal-band {
+      background: #141414; border: 1px solid #262626;
+      border-radius: 10px; padding: 16px;
+    }
+    .renewal-band h3 { font-size: 0.78rem; font-weight: 600; color: #aaa; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .renewal-band.urgent   { border-color: #dc2626; }
+    .renewal-band.upcoming { border-color: #ca8a04; }
+    .renewal-band.future   { border-color: #1d4ed8; }
+    .renewal-band h3.urgent   { color: #f87171; }
+    .renewal-band h3.upcoming { color: #fbbf24; }
+    .renewal-band h3.future   { color: #93c5fd; }
+    .renewal-item { font-size: 0.82rem; padding: 5px 0; border-bottom: 1px solid #1e1e1e; }
+    .renewal-item:last-child { border-bottom: none; }
+    .renewal-item .r-name { font-weight: 500; }
+    .renewal-item .r-date { color: #666; font-size: 0.75rem; }
+    .renewal-empty { color: #555; font-size: 0.8rem; font-style: italic; }
   </style>
 </head>
 <body>
@@ -173,7 +237,39 @@
       <h1>Import Clients</h1>
       <p class="subtitle">Upload a CSV to import clients into NxtStepOS. Errors appear per row.</p>
     </div>
-    <button id="exportBtn" style="margin-top:6px;background:#1e1e1e;color:#e5e5e5;border:1px solid #333;white-space:nowrap;">Export CSV</button>
+    <div style="display:flex;gap:8px;margin-top:6px;">
+      <button id="addClientBtn" style="background:#1e1e1e;color:#e5e5e5;border:1px solid #333;white-space:nowrap;margin-top:0;">+ Add Client</button>
+      <button id="exportBtn" style="background:#1e1e1e;color:#e5e5e5;border:1px solid #333;white-space:nowrap;margin-top:0;">Export CSV</button>
+    </div>
+  </div>
+
+  <!-- Add / Edit modal -->
+  <div class="modal-overlay" id="clientModal">
+    <div class="modal">
+      <h2 id="modalTitle">Add Client</h2>
+      <div class="modal-grid">
+        <div><label>First Name *</label><input id="mFirstName" type="text" /></div>
+        <div><label>Last Name *</label><input id="mLastName" type="text" /></div>
+        <div><label>Email</label><input id="mEmail" type="email" /></div>
+        <div><label>Phone</label><input id="mPhone" type="text" /></div>
+        <div><label>Policy Type</label><input id="mPolicyType" type="text" /></div>
+        <div><label>Renewal Date</label><input id="mRenewalDate" type="date" /></div>
+        <div><label>Status</label>
+          <select id="mStatus">
+            <option value="">— select —</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+        <div><label>Agency ID</label><input id="mAgencyId" type="text" /></div>
+        <div class="full"><label>Notes</label><input id="mNotes" type="text" /></div>
+      </div>
+      <div class="modal-err" id="modalErr"></div>
+      <div class="modal-actions">
+        <button class="cancel-btn" id="modalCancel">Cancel</button>
+        <button class="save-btn" id="modalSave">Save</button>
+      </div>
+    </div>
   </div>
 
   <div class="card">
@@ -185,6 +281,29 @@
       Common aliases are recognised (e.g. "First Name", "Last Name", "name", "Email Address").
     </p>
     <button id="importBtn" disabled>Import Clients</button>
+  </div>
+
+  <div id="renewal-section">
+    <div class="renewal-header" id="renewalToggle">
+      <h2>Upcoming Renewals</h2>
+      <span class="toggle" id="renewalToggleLabel">▲ Hide</span>
+    </div>
+    <div id="renewalContent">
+      <div class="renewal-bands">
+        <div class="renewal-band urgent">
+          <h3 class="urgent">Within 30 days</h3>
+          <div id="band30"></div>
+        </div>
+        <div class="renewal-band upcoming">
+          <h3 class="upcoming">31 – 60 days</h3>
+          <div id="band60"></div>
+        </div>
+        <div class="renewal-band future">
+          <h3 class="future">61 – 90 days</h3>
+          <div id="band90"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="search-section">
@@ -559,12 +678,23 @@
         <td>${escHtml(c.policy_type || '—')}</td>
         <td>${renewalDisplay}</td>
         <td>${statusBadge}</td>
-        <td><button class="del-btn" data-id="${c.id}" title="Delete client">✕</button></td>
+        <td>
+          <button class="edit-btn" data-id="${c.id}" title="Edit client">Edit</button>
+          <button class="del-btn" data-id="${c.id}" title="Delete client">✕</button>
+        </td>
       </tr>`;
     }
 
     html += '</tbody></table>';
     document.getElementById('client-table').innerHTML = html;
+
+    // Wire up edit buttons
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const client = allClients.find(c => String(c.id) === btn.dataset.id);
+        if (client) openModal(client);
+      });
+    });
 
     // Wire up delete buttons
     document.querySelectorAll('.del-btn').forEach(btn => {
@@ -620,6 +750,138 @@
   _origImportBtn.addEventListener('click', () => setTimeout(loadClients, 3000));
 
   loadClients();
+
+  // ── Renewal dashboard ───────────────────────────────────────────────────────
+  function renderRenewals() {
+    const now   = new Date(); now.setHours(0,0,0,0);
+    const d30   = new Date(now); d30.setDate(now.getDate() + 30);
+    const d60   = new Date(now); d60.setDate(now.getDate() + 60);
+    const d90   = new Date(now); d90.setDate(now.getDate() + 90);
+
+    const bands = { b30: [], b60: [], b90: [] };
+    for (const c of allClients) {
+      if (!c.renewal_date) continue;
+      const rd = new Date(c.renewal_date);
+      if (rd < now) continue;
+      if (rd <= d30)      bands.b30.push(c);
+      else if (rd <= d60) bands.b60.push(c);
+      else if (rd <= d90) bands.b90.push(c);
+    }
+
+    const fmt = id => {
+      const list = bands[id];
+      if (list.length === 0) return '<p class="renewal-empty">None</p>';
+      return list.sort((a,b) => a.renewal_date.localeCompare(b.renewal_date))
+        .map(c => `<div class="renewal-item">
+          <div class="r-name">${escHtml(c.first_name)} ${escHtml(c.last_name)}</div>
+          <div class="r-date">${escHtml(c.renewal_date)} · ${escHtml(c.policy_type || '—')}</div>
+        </div>`).join('');
+    };
+
+    document.getElementById('band30').innerHTML = fmt('b30');
+    document.getElementById('band60').innerHTML = fmt('b60');
+    document.getElementById('band90').innerHTML = fmt('b90');
+  }
+
+  // Call renderRenewals whenever clients load
+  const _origLoadClients = loadClients;
+  loadClients = async function() {
+    await _origLoadClients();
+    renderRenewals();
+  };
+
+  let renewalVisible = true;
+  document.getElementById('renewalToggle').addEventListener('click', () => {
+    renewalVisible = !renewalVisible;
+    document.getElementById('renewalContent').style.display = renewalVisible ? '' : 'none';
+    document.getElementById('renewalToggleLabel').textContent = renewalVisible ? '▲ Hide' : '▼ Show';
+  });
+
+  // ── Add / Edit modal ────────────────────────────────────────────────────────
+  let editingId = null;
+
+  function openModal(client = null) {
+    editingId = client ? client.id : null;
+    document.getElementById('modalTitle').textContent = client ? 'Edit Client' : 'Add Client';
+    document.getElementById('mFirstName').value  = client?.first_name  || '';
+    document.getElementById('mLastName').value   = client?.last_name   || '';
+    document.getElementById('mEmail').value      = client?.email       || '';
+    document.getElementById('mPhone').value      = client?.phone       || '';
+    document.getElementById('mPolicyType').value = client?.policy_type || '';
+    document.getElementById('mRenewalDate').value= client?.renewal_date|| '';
+    document.getElementById('mStatus').value     = client?.status      || '';
+    document.getElementById('mAgencyId').value   = client?.agency_id   || '';
+    document.getElementById('mNotes').value      = client?.notes       || '';
+    document.getElementById('modalErr').textContent = '';
+    document.getElementById('clientModal').classList.add('open');
+    document.getElementById('mFirstName').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('clientModal').classList.remove('open');
+    editingId = null;
+  }
+
+  document.getElementById('modalCancel').addEventListener('click', closeModal);
+  document.getElementById('clientModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('clientModal')) closeModal();
+  });
+
+  document.getElementById('addClientBtn').addEventListener('click', () => openModal());
+
+  document.getElementById('modalSave').addEventListener('click', async () => {
+    const first = document.getElementById('mFirstName').value.trim();
+    const last  = document.getElementById('mLastName').value.trim();
+    if (!first || !last) {
+      document.getElementById('modalErr').textContent = 'First name and last name are required.';
+      return;
+    }
+
+    const payload = { first_name: first, last_name: last };
+    const email   = document.getElementById('mEmail').value.trim();
+    const phone   = document.getElementById('mPhone').value.trim();
+    const policy  = document.getElementById('mPolicyType').value.trim();
+    const renewal = document.getElementById('mRenewalDate').value;
+    const status  = document.getElementById('mStatus').value;
+    const agency  = document.getElementById('mAgencyId').value.trim();
+    const notes   = document.getElementById('mNotes').value.trim();
+    if (email)   payload.email        = email;
+    if (phone)   payload.phone        = phone;
+    if (policy)  payload.policy_type  = policy;
+    if (renewal) payload.renewal_date = renewal;
+    if (status)  payload.status       = status;
+    if (agency)  payload.agency_id    = agency;
+    if (notes)   payload.notes        = notes;
+
+    const saveBtn = document.getElementById('modalSave');
+    saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+
+    const isEdit = editingId !== null;
+    const url    = isEdit
+      ? `${SUPABASE_URL}/rest/v1/clients?id=eq.${editingId}`
+      : `${SUPABASE_URL}/rest/v1/clients`;
+
+    const res = await fetch(url, {
+      method: isEdit ? 'PATCH' : 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      closeModal();
+      await loadClients();
+    } else {
+      const body = await res.json().catch(() => ({}));
+      document.getElementById('modalErr').textContent = body.message || `HTTP ${res.status}`;
+    }
+
+    saveBtn.disabled = false; saveBtn.textContent = 'Save';
+  });
 
   // ── Export ─────────────────────────────────────────────────────────────────
   document.getElementById('exportBtn').addEventListener('click', async () => {
