@@ -487,10 +487,10 @@
 
     <!-- TABS -->
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('leads')">Recent Leads</button>
-      <button class="tab" onclick="switchTab('clients')">Clients</button>
-      <button class="tab" onclick="switchTab('renewals')">Renewals</button>
-      <button class="tab" onclick="switchTab('email')">Send Email</button>
+      <button class="tab active" onclick="switchTab('leads', this)">Recent Leads</button>
+      <button class="tab" onclick="switchTab('clients', this)">Clients</button>
+      <button class="tab" onclick="switchTab('renewals', this)">Renewals</button>
+      <button class="tab" onclick="switchTab('email', this)">Send Email</button>
     </div>
 
     <!-- LEADS PANEL -->
@@ -744,10 +744,10 @@
   }
 
   // --- TABS ---
-  function switchTab(name) {
+  function switchTab(name, btn) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    event.target.classList.add('active');
+    btn.classList.add('active');
     document.getElementById('panel-' + name).classList.add('active');
   }
 
