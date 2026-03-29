@@ -425,6 +425,133 @@
     .renewal-days { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 20px; color: var(--yellow); }
     .renewal-days span { font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 400; color: var(--muted); }
 
+    /* CLIENT PANEL TOOLBAR */
+    .client-toolbar {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      margin-bottom: 16px; align-items: center;
+    }
+    .client-toolbar input[type="text"] {
+      flex: 1; min-width: 160px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 9px 14px; font-size: 13px;
+      font-family: 'DM Sans', sans-serif; color: var(--text); outline: none;
+    }
+    .client-toolbar input[type="text"]:focus { border-color: var(--accent); }
+    .client-toolbar select {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 9px 12px; font-size: 13px;
+      font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; cursor: pointer;
+      width: auto; resize: none;
+    }
+    .client-toolbar select:focus { border-color: var(--accent); box-shadow: none; }
+    .client-action-btn {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 10px; padding: 9px 16px;
+      font-size: 13px; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; white-space: nowrap; font-weight: 500;
+      transition: border-color 0.2s;
+    }
+    .client-action-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .client-action-btn.primary {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+    }
+    .client-action-btn.primary:hover { opacity: 0.9; color: #fff; }
+    .client-count { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+
+    /* Sortable headers */
+    thead th.sortable { cursor: pointer; user-select: none; }
+    thead th.sortable:hover { color: var(--text); }
+    thead th .sort-arrow { margin-left: 4px; opacity: 0.4; font-size: 10px; }
+    thead th.sort-asc .sort-arrow::after  { content: '▲'; opacity: 1; color: var(--accent); }
+    thead th.sort-desc .sort-arrow::after { content: '▼'; opacity: 1; color: var(--accent); }
+    thead th:not(.sort-asc):not(.sort-desc) .sort-arrow::after { content: '⇅'; }
+
+    .row-edit-btn {
+      background: transparent; border: 1px solid rgba(52,211,153,0.2);
+      color: var(--green); border-radius: 6px; padding: 3px 10px;
+      font-size: 12px; cursor: pointer; font-family: 'DM Sans',sans-serif;
+      margin-right: 4px; transition: background 0.15s;
+    }
+    .row-edit-btn:hover { background: rgba(52,211,153,0.1); }
+    .row-del-btn {
+      background: transparent; border: 1px solid rgba(248,113,113,0.2);
+      color: var(--red); border-radius: 6px; padding: 3px 10px;
+      font-size: 12px; cursor: pointer; font-family: 'DM Sans',sans-serif;
+      transition: background 0.15s;
+    }
+    .row-del-btn:hover { background: rgba(248,113,113,0.1); }
+    .renewal-warn { color: var(--yellow); font-weight: 600; }
+    .badge-inactive { background: rgba(107,107,128,0.15); color: var(--muted); }
+
+    /* Renewal bands */
+    .renewal-bands {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px;
+    }
+    @media(max-width:640px) { .renewal-bands { grid-template-columns: 1fr; } }
+    .renewal-band {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px;
+    }
+    .renewal-band.urgent   { border-color: rgba(248,113,113,0.4); }
+    .renewal-band.upcoming { border-color: rgba(251,191,36,0.4); }
+    .renewal-band.future   { border-color: rgba(79,110,247,0.4); }
+    .renewal-band h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+    .renewal-band.urgent h3   { color: var(--red); }
+    .renewal-band.upcoming h3 { color: var(--yellow); }
+    .renewal-band.future h3   { color: var(--accent); }
+    .renewal-band-item { font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--border); }
+    .renewal-band-item:last-child { border-bottom: none; }
+    .renewal-band-item .rbi-name { font-weight: 500; }
+    .renewal-band-item .rbi-date { font-size: 11px; color: var(--muted); }
+    .renewal-band-empty { font-size: 12px; color: var(--muted); font-style: italic; }
+
+    /* Import results */
+    .import-summary {
+      padding: 12px 16px; border-radius: 8px; font-size: 13px;
+      margin-bottom: 12px; border: 1px solid;
+    }
+    .import-summary.success { background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.25); color: var(--green); }
+    .import-summary.warning { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.25); color: var(--yellow); }
+    .import-summary.error   { background: rgba(248,113,113,0.08); border-color: rgba(248,113,113,0.25); color: var(--red); }
+    .import-summary.info    { background: rgba(79,110,247,0.08); border-color: rgba(79,110,247,0.25); color: var(--accent); }
+    .badge-imported  { background: rgba(52,211,153,0.15); color: var(--green); }
+    .badge-skipped   { background: rgba(251,191,36,0.15); color: var(--yellow); }
+    .badge-duplicate { background: rgba(139,92,246,0.15); color: #a78bfa; }
+    .badge-failed    { background: rgba(248,113,113,0.15); color: var(--red); }
+    .import-err { font-size: 11px; color: var(--red); margin-top: 2px; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px; width: 100%;
+      max-width: 520px; margin: 20px;
+    }
+    .modal-box h2 { font-family: 'Syne',sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 20px; }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .modal-grid .full { grid-column: 1 / -1; }
+    .modal-grid label { font-size: 11px; }
+    .modal-grid input, .modal-grid select { padding: 9px 12px; font-size: 13px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .modal-cancel {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 8px; padding: 9px 20px; font-size: 13px;
+      font-family: 'DM Sans',sans-serif; cursor: pointer;
+    }
+    .modal-cancel:hover { border-color: var(--text); color: var(--text); }
+    .modal-save {
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 600;
+      font-family: 'DM Sans',sans-serif; cursor: pointer;
+    }
+    .modal-save:disabled { opacity: 0.5; cursor: not-allowed; }
+    .modal-err-msg { color: var(--red); font-size: 12px; margin-top: 10px; min-height: 16px; }
+
     /* MOBILE scroll hint */
     .scroll-hint {
       display: none;
@@ -521,27 +648,77 @@
 
     <!-- CLIENTS PANEL -->
     <div class="panel" id="panel-clients">
+
+      <!-- Toolbar -->
+      <div class="client-toolbar">
+        <input type="text" id="clientSearch" placeholder="Search by name, email, phone…" />
+        <select id="clientStatusFilter">
+          <option value="">All statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+        <select id="clientPolicyFilter">
+          <option value="">All policy types</option>
+        </select>
+        <button class="client-action-btn" id="clientClearBtn">Clear</button>
+        <button class="client-action-btn primary" id="addClientBtn">+ Add Client</button>
+        <button class="client-action-btn" id="importCsvBtn">Import CSV</button>
+        <button class="client-action-btn" id="exportCsvBtn">Export CSV</button>
+        <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none" />
+      </div>
+
+      <!-- Client count -->
+      <div class="client-count" id="clientCount"></div>
+
+      <!-- Import status -->
+      <div id="importStatus"></div>
+
+      <!-- Renewal bands -->
+      <div class="renewal-bands">
+        <div class="renewal-band urgent"><h3>Within 30 days</h3><div id="rband30"></div></div>
+        <div class="renewal-band upcoming"><h3>31–60 days</h3><div id="rband60"></div></div>
+        <div class="renewal-band future"><h3>61–90 days</h3><div id="rband90"></div></div>
+      </div>
+
+      <!-- Clients table -->
       <div class="scroll-hint">← scroll to see more</div>
       <div class="table-wrap">
         <div class="table-header">
           <div class="table-title">All Clients</div>
-          <span class="count-badge" id="clientsCount">Loading...</span>
+          <span class="count-badge" id="clientsCount">Loading…</span>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Policy</th>
-              <th>Renewal</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="clientsBody">
-            <tr><td colspan="6"><div class="empty-state"><div class="icon">⏳</div>Loading clients...</div></td></tr>
-          </tbody>
-        </table>
+        <div id="clientTableWrap">
+          <div class="empty-state"><div class="icon">⏳</div>Loading clients…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add / Edit modal -->
+    <div class="modal-overlay" id="clientModal">
+      <div class="modal-box">
+        <h2 id="modalTitle">Add Client</h2>
+        <div class="modal-grid">
+          <div><label>First Name *</label><input id="mFirst" type="text" /></div>
+          <div><label>Last Name *</label><input id="mLast" type="text" /></div>
+          <div><label>Email</label><input id="mEmail" type="email" /></div>
+          <div><label>Phone</label><input id="mPhone" type="text" /></div>
+          <div><label>Policy Type</label><input id="mPolicy" type="text" /></div>
+          <div><label>Renewal Date</label><input id="mRenewal" type="date" /></div>
+          <div><label>Status</label>
+            <select id="mStatus">
+              <option value="">— select —</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div><label>Agency ID</label><input id="mAgency" type="text" /></div>
+          <div class="full"><label>Notes</label><input id="mNotes" type="text" /></div>
+        </div>
+        <div class="modal-err-msg" id="modalErr"></div>
+        <div class="modal-actions">
+          <button class="modal-cancel" id="modalCancel">Cancel</button>
+          <button class="modal-save" id="modalSave">Save</button>
+        </div>
       </div>
     </div>
 
@@ -638,43 +815,43 @@
     `).join('');
   }
 
-  // --- CLIENTS ---
+  // ── CLIENTS ────────────────────────────────────────────────────────────────
+  let allClients = [];
+  let clientSortCol = 'last_name', clientSortDir = 'asc';
+  const CLIENT_COLS = ['first_name','last_name','email','phone','policy_type','renewal_date','status','notes','agency_id'];
+
   async function loadClients() {
-    const { data, error } = await client.from('clients').select('*').order('created_at', { ascending: false });
+    const { data, error } = await client.from('clients').select('*').order('last_name', { ascending: true });
     if (error) { console.error(error); return; }
+    allClients = data || [];
 
-    const activeClients = data.filter(c => c.status === 'active' || !c.status);
-    document.getElementById('statClients').textContent = activeClients.length;
-    document.getElementById('clientsCount').textContent = `${data.length} clients`;
+    // Update stat cards
+    const active = allClients.filter(c => c.status === 'active' || !c.status).length;
+    document.getElementById('statClients').textContent = active;
+    document.getElementById('clientsCount').textContent = `${allClients.length} clients`;
 
-    // Renewals within 90 days
-    const now = new Date();
-    const in90 = new Date(); in90.setDate(now.getDate() + 90);
-    const renewalsSoon = data.filter(c => {
+    // Renewals stat
+    const now = new Date(); now.setHours(0,0,0,0);
+    const in90 = new Date(now); in90.setDate(now.getDate() + 90);
+    const renewalsSoon = allClients.filter(c => {
       if (!c.renewal_date) return false;
       const d = new Date(c.renewal_date);
       return d >= now && d <= in90;
     });
     document.getElementById('statRenewals').textContent = renewalsSoon.length;
 
-    // Clients table
-    const tbody = document.getElementById('clientsBody');
-    if (data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">👥</div>No clients yet. Import one at /import.html</div></td></tr>`;
-    } else {
-      tbody.innerHTML = data.map(c => `
-        <tr>
-          <td><strong>${esc((c.first_name || '') + ' ' + (c.last_name || ''))}</strong></td>
-          <td><a href="mailto:${esc(c.email)}" style="color:var(--accent);text-decoration:none;">${esc(c.email || '—')}</a></td>
-          <td>${esc(c.phone || '—')}</td>
-          <td>${esc(c.policy_type || '—')}</td>
-          <td style="color:var(--muted);font-size:13px;">${c.renewal_date ? formatDate(c.renewal_date) : '—'}</td>
-          <td><span class="badge badge-${c.status || 'active'}">${esc(c.status || 'active')}</span></td>
-        </tr>
-      `).join('');
-    }
+    // Repopulate policy filter
+    const pf = document.getElementById('clientPolicyFilter');
+    const current = pf.value;
+    pf.innerHTML = '<option value="">All policy types</option>';
+    [...new Set(allClients.map(c => c.policy_type).filter(Boolean))].sort().forEach(t => {
+      const o = document.createElement('option');
+      o.value = t; o.textContent = t;
+      pf.appendChild(o);
+    });
+    pf.value = current;
 
-    // Renewals panel
+    // Renewals panel (main dashboard tab)
     const renewalsBody = document.getElementById('renewalsBody');
     if (renewalsSoon.length === 0) {
       renewalsBody.innerHTML = `<div class="empty-state"><div class="icon">🎉</div>No renewals due in the next 90 days.</div>`;
@@ -683,20 +860,400 @@
         .sort((a,b) => new Date(a.renewal_date) - new Date(b.renewal_date))
         .map(c => {
           const days = Math.ceil((new Date(c.renewal_date) - now) / (1000*60*60*24));
-          return `
-            <div class="renewal-item">
-              <div>
-                <div class="renewal-name">${esc((c.first_name || '') + ' ' + (c.last_name || ''))}</div>
-                <div class="renewal-detail">${esc(c.policy_type || 'Policy')} · ${esc(c.email || '')}</div>
-              </div>
-              <div style="text-align:right;">
-                <div class="renewal-days">${days} <span>days</span></div>
-                <div style="font-size:12px;color:var(--muted);">${formatDate(c.renewal_date)}</div>
-              </div>
+          return `<div class="renewal-item">
+            <div>
+              <div class="renewal-name">${esc((c.first_name||'') + ' ' + (c.last_name||''))}</div>
+              <div class="renewal-detail">${esc(c.policy_type||'Policy')} · ${esc(c.email||'')}</div>
             </div>
-          `;
+            <div style="text-align:right;">
+              <div class="renewal-days">${days} <span>days</span></div>
+              <div style="font-size:12px;color:var(--muted);">${formatDate(c.renewal_date)}</div>
+            </div>
+          </div>`;
         }).join('');
     }
+
+    renderClients();
+  }
+
+  function renderClients() {
+    const q      = (document.getElementById('clientSearch').value || '').toLowerCase().trim();
+    const status = document.getElementById('clientStatusFilter').value;
+    const policy = document.getElementById('clientPolicyFilter').value;
+
+    let filtered = allClients.filter(c => {
+      if (status && c.status !== status) return false;
+      if (policy && c.policy_type !== policy) return false;
+      if (q) {
+        const hay = [c.first_name, c.last_name, c.email, c.phone].join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+
+    // Sort
+    filtered.sort((a, b) => {
+      const av = (a[clientSortCol] || '').toLowerCase();
+      const bv = (b[clientSortCol] || '').toLowerCase();
+      return clientSortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+    });
+
+    // Count line
+    const active   = allClients.filter(c => c.status === 'active').length;
+    const inactive = allClients.filter(c => c.status === 'inactive').length;
+    const showing  = filtered.length !== allClients.length ? ` · showing ${filtered.length}` : '';
+    document.getElementById('clientCount').textContent =
+      `${allClients.length} client${allClients.length !== 1 ? 's' : ''} · ${active} active · ${inactive} inactive${showing}`;
+
+    // Renewal bands
+    const now   = new Date(); now.setHours(0,0,0,0);
+    const d30   = new Date(now); d30.setDate(now.getDate() + 30);
+    const d60   = new Date(now); d60.setDate(now.getDate() + 60);
+    const d90   = new Date(now); d90.setDate(now.getDate() + 90);
+    const bands = { b30: [], b60: [], b90: [] };
+    allClients.forEach(c => {
+      if (!c.renewal_date) return;
+      const rd = new Date(c.renewal_date);
+      if (rd < now) return;
+      if (rd <= d30) bands.b30.push(c);
+      else if (rd <= d60) bands.b60.push(c);
+      else if (rd <= d90) bands.b90.push(c);
+    });
+    ['30','60','90'].forEach((n, i) => {
+      const key = `b${n}`;
+      const el  = document.getElementById(`rband${n}`);
+      if (bands[key].length === 0) { el.innerHTML = '<p class="renewal-band-empty">None</p>'; return; }
+      el.innerHTML = bands[key]
+        .sort((a,b) => a.renewal_date.localeCompare(b.renewal_date))
+        .map(c => `<div class="renewal-band-item">
+          <div class="rbi-name">${esc(c.first_name)} ${esc(c.last_name)}</div>
+          <div class="rbi-date">${esc(c.renewal_date)} · ${esc(c.policy_type||'—')}</div>
+        </div>`).join('');
+    });
+
+    // Table
+    const wrap = document.getElementById('clientTableWrap');
+    if (filtered.length === 0) {
+      wrap.innerHTML = `<div class="empty-state"><div class="icon">👥</div>${allClients.length === 0 ? 'No clients yet. Use Import CSV or Add Client.' : 'No clients match your filters.'}</div>`;
+      return;
+    }
+
+    const colDefs = [
+      { label: 'Name',        key: 'last_name'    },
+      { label: 'Email',       key: 'email'        },
+      { label: 'Phone',       key: 'phone'        },
+      { label: 'Policy Type', key: 'policy_type'  },
+      { label: 'Renewal',     key: 'renewal_date' },
+      { label: 'Status',      key: 'status'       },
+    ];
+    const headers = colDefs.map(col => {
+      const cls = clientSortCol === col.key
+        ? `sortable sort-${clientSortDir}` : 'sortable';
+      return `<th class="${cls}" data-col="${col.key}">${col.label}<span class="sort-arrow"></span></th>`;
+    }).join('') + '<th></th>';
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const in30  = new Date(today); in30.setDate(today.getDate() + 30);
+
+    let html = `<table><thead><tr>${headers}</tr></thead><tbody>`;
+    filtered.forEach(c => {
+      const statusBadge = `<span class="badge badge-${c.status||'active'}">${esc(c.status||'active')}</span>`;
+      let renewalCell = esc(c.renewal_date || '—');
+      if (c.renewal_date) {
+        const rd = new Date(c.renewal_date);
+        if (rd >= today && rd <= in30)
+          renewalCell = `<span class="renewal-warn" title="Renewing within 30 days">⚠ ${esc(c.renewal_date)}</span>`;
+      }
+      html += `<tr>
+        <td><strong>${esc((c.first_name||'')+' '+(c.last_name||''))}</strong></td>
+        <td><a href="mailto:${esc(c.email||'')}" style="color:var(--accent);text-decoration:none;">${esc(c.email||'—')}</a></td>
+        <td>${esc(c.phone||'—')}</td>
+        <td>${esc(c.policy_type||'—')}</td>
+        <td style="font-size:13px;">${renewalCell}</td>
+        <td>${statusBadge}</td>
+        <td>
+          <button class="row-edit-btn" data-id="${c.id}">Edit</button>
+          <button class="row-del-btn"  data-id="${c.id}">✕</button>
+        </td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+
+    // Sort header clicks
+    wrap.querySelectorAll('th.sortable').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (clientSortCol === col) clientSortDir = clientSortDir === 'asc' ? 'desc' : 'asc';
+        else { clientSortCol = col; clientSortDir = 'asc'; }
+        renderClients();
+      });
+    });
+
+    // Edit buttons
+    wrap.querySelectorAll('.row-edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const c = allClients.find(x => String(x.id) === btn.dataset.id);
+        if (c) openClientModal(c);
+      });
+    });
+
+    // Delete buttons
+    wrap.querySelectorAll('.row-del-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const c = allClients.find(x => String(x.id) === btn.dataset.id);
+        if (!c) return;
+        if (!confirm(`Delete ${c.first_name} ${c.last_name}?`)) return;
+        btn.disabled = true; btn.textContent = '…';
+        const { error } = await client.from('clients').delete().eq('id', c.id);
+        if (error) {
+          alert(`Delete failed: ${error.message}`);
+          btn.disabled = false; btn.textContent = '✕';
+        } else {
+          allClients = allClients.filter(x => x.id !== c.id);
+          renderClients();
+          document.getElementById('statClients').textContent =
+            allClients.filter(x => x.status === 'active' || !x.status).length;
+        }
+      });
+    });
+  }
+
+  // Search / filter listeners
+  document.getElementById('clientSearch').addEventListener('input', renderClients);
+  document.getElementById('clientStatusFilter').addEventListener('change', renderClients);
+  document.getElementById('clientPolicyFilter').addEventListener('change', renderClients);
+  document.getElementById('clientClearBtn').addEventListener('click', () => {
+    document.getElementById('clientSearch').value = '';
+    document.getElementById('clientStatusFilter').value = '';
+    document.getElementById('clientPolicyFilter').value = '';
+    renderClients();
+  });
+
+  // ── ADD / EDIT MODAL ───────────────────────────────────────────────────────
+  let editingClientId = null;
+
+  function openClientModal(c = null) {
+    editingClientId = c ? c.id : null;
+    document.getElementById('modalTitle').textContent = c ? 'Edit Client' : 'Add Client';
+    document.getElementById('mFirst').value   = c?.first_name   || '';
+    document.getElementById('mLast').value    = c?.last_name    || '';
+    document.getElementById('mEmail').value   = c?.email        || '';
+    document.getElementById('mPhone').value   = c?.phone        || '';
+    document.getElementById('mPolicy').value  = c?.policy_type  || '';
+    document.getElementById('mRenewal').value = c?.renewal_date || '';
+    document.getElementById('mStatus').value  = c?.status       || '';
+    document.getElementById('mAgency').value  = c?.agency_id    || '';
+    document.getElementById('mNotes').value   = c?.notes        || '';
+    document.getElementById('modalErr').textContent = '';
+    document.getElementById('clientModal').classList.add('open');
+    document.getElementById('mFirst').focus();
+  }
+
+  function closeClientModal() {
+    document.getElementById('clientModal').classList.remove('open');
+    editingClientId = null;
+  }
+
+  document.getElementById('addClientBtn').addEventListener('click', () => openClientModal());
+  document.getElementById('modalCancel').addEventListener('click', closeClientModal);
+  document.getElementById('clientModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('clientModal')) closeClientModal();
+  });
+
+  document.getElementById('modalSave').addEventListener('click', async () => {
+    const first = document.getElementById('mFirst').value.trim();
+    const last  = document.getElementById('mLast').value.trim();
+    if (!first || !last) {
+      document.getElementById('modalErr').textContent = 'First name and last name are required.';
+      return;
+    }
+    const payload = { first_name: first, last_name: last };
+    const email   = document.getElementById('mEmail').value.trim();
+    const phone   = document.getElementById('mPhone').value.trim();
+    const policy  = document.getElementById('mPolicy').value.trim();
+    const renewal = document.getElementById('mRenewal').value;
+    const status  = document.getElementById('mStatus').value;
+    const agency  = document.getElementById('mAgency').value.trim();
+    const notes   = document.getElementById('mNotes').value.trim();
+    if (email)   payload.email        = email;
+    if (phone)   payload.phone        = phone;
+    if (policy)  payload.policy_type  = policy;
+    if (renewal) payload.renewal_date = renewal;
+    if (status)  payload.status       = status;
+    if (agency)  payload.agency_id    = agency;
+    if (notes)   payload.notes        = notes;
+
+    const saveBtn = document.getElementById('modalSave');
+    saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+    try {
+      let error;
+      if (editingClientId) {
+        ({ error } = await client.from('clients').update(payload).eq('id', editingClientId));
+      } else {
+        ({ error } = await client.from('clients').insert(payload));
+      }
+      if (error) {
+        document.getElementById('modalErr').textContent = error.message;
+      } else {
+        closeClientModal();
+        await loadClients();
+      }
+    } catch (err) {
+      document.getElementById('modalErr').textContent = `Error: ${err.message}`;
+    } finally {
+      saveBtn.disabled = false; saveBtn.textContent = 'Save';
+    }
+  });
+
+  // ── CSV IMPORT ─────────────────────────────────────────────────────────────
+  document.getElementById('importCsvBtn').addEventListener('click', () => {
+    document.getElementById('csvFileInput').value = '';
+    document.getElementById('csvFileInput').click();
+  });
+
+  document.getElementById('csvFileInput').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('importStatus');
+    statusEl.innerHTML = '<div class="import-summary info">Reading CSV…</div>';
+
+    try {
+      const text = await file.text();
+      const rows = parseCSV(text);
+      if (rows.length === 0) {
+        statusEl.innerHTML = '<div class="import-summary warning">CSV is empty or could not be parsed.</div>';
+        return;
+      }
+      statusEl.innerHTML = `<div class="import-summary info">Parsed <strong>${rows.length}</strong> row(s). Importing…</div>`;
+
+      const results = [];
+      let ok = 0, skipped = 0, dupes = 0, failed = 0;
+
+      for (let i = 0; i < rows.length; i++) {
+        const record = mapCsvColumns(rows[i]);
+        if (!record.first_name || !record.last_name) {
+          results.push({ row: i+2, status: 'skipped', name: Object.values(rows[i]).slice(0,2).join(' '),
+            reason: `Missing first_name/last_name. Headers: [${Object.keys(rows[i]).join(', ')}]` });
+          skipped++; continue;
+        }
+        // Dupe check
+        const { data: existing } = await client.from('clients')
+          .select('id').eq('first_name', record.first_name).eq('last_name', record.last_name).limit(1);
+        if (existing && existing.length > 0) {
+          results.push({ row: i+2, status: 'duplicate', name: `${record.first_name} ${record.last_name}`, reason: 'Already exists' });
+          dupes++; continue;
+        }
+        // Insert
+        const payload = {};
+        CLIENT_COLS.forEach(col => { if (record[col]) payload[col] = record[col]; });
+        const { error } = await client.from('clients').insert(payload);
+        if (error) {
+          results.push({ row: i+2, status: 'failed', name: `${record.first_name} ${record.last_name}`, reason: error.message });
+          failed++;
+        } else {
+          results.push({ row: i+2, status: 'imported', name: `${record.first_name} ${record.last_name}` });
+          ok++;
+        }
+      }
+
+      const cls = failed > 0 && ok === 0 ? 'error' : (failed > 0 || skipped > 0 || dupes > 0) ? 'warning' : 'success';
+      let html = `<div class="import-summary ${cls}">
+        <strong>${ok}</strong> imported · <strong>${dupes}</strong> duplicate${dupes!==1?'s':''} · <strong>${skipped}</strong> skipped · <strong>${failed}</strong> failed
+      </div>`;
+      html += `<table style="margin-bottom:20px;"><thead><tr>
+        <th>Row</th><th>Status</th><th>Name</th><th>Note</th>
+      </tr></thead><tbody>`;
+      results.forEach(r => {
+        const badgeCls = r.status === 'imported' ? 'badge-imported' : r.status === 'duplicate' ? 'badge-duplicate' : r.status === 'skipped' ? 'badge-skipped' : 'badge-failed';
+        const label    = r.status.charAt(0).toUpperCase() + r.status.slice(1);
+        html += `<tr>
+          <td>${r.row}</td>
+          <td><span class="badge ${badgeCls}">${label}</span></td>
+          <td>${esc(r.name)}</td>
+          <td>${r.reason ? `<div class="import-err">${esc(r.reason)}</div>` : ''}</td>
+        </tr>`;
+      });
+      html += '</tbody></table>';
+      statusEl.innerHTML = html;
+      await loadClients();
+    } catch (err) {
+      statusEl.innerHTML = `<div class="import-summary error">Error: ${esc(err.message)}</div>`;
+    }
+  });
+
+  // ── CSV EXPORT ─────────────────────────────────────────────────────────────
+  document.getElementById('exportCsvBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('exportCsvBtn');
+    btn.textContent = 'Exporting…'; btn.disabled = true;
+    try {
+      const { data, error } = await client.from('clients').select(CLIENT_COLS.join(',')).order('last_name');
+      if (error || !data || data.length === 0) { alert(error?.message || 'No clients to export.'); return; }
+      const rows = [CLIENT_COLS.join(',')];
+      data.forEach(c => {
+        rows.push(CLIENT_COLS.map(col => {
+          const v = c[col] == null ? '' : String(c[col]);
+          return v.includes(',') || v.includes('"') ? `"${v.replace(/"/g,'""')}"` : v;
+        }).join(','));
+      });
+      const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+      const url  = URL.createObjectURL(blob);
+      const a    = Object.assign(document.createElement('a'), { href: url, download: `clients_${new Date().toISOString().slice(0,10)}.csv` });
+      a.click(); URL.revokeObjectURL(url);
+    } catch(err) { alert(`Export error: ${err.message}`); }
+    finally { btn.textContent = 'Export CSV'; btn.disabled = false; }
+  });
+
+  // ── CSV PARSER ─────────────────────────────────────────────────────────────
+  function parseCSV(text) {
+    const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l => l.trim());
+    if (lines.length < 2) return [];
+    const headers = splitCSVLine(lines[0]).map(h => h.trim());
+    return lines.slice(1).map(line => {
+      const vals = splitCSVLine(line);
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = (vals[i]||'').trim(); });
+      return obj;
+    }).filter(r => Object.values(r).some(v => v));
+  }
+
+  function splitCSVLine(line) {
+    const out = []; let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c==='"') { if (inQ && line[i+1]==='"') { cur+='"'; i++; } else inQ=!inQ; }
+      else if (c===',' && !inQ) { out.push(cur); cur=''; }
+      else cur+=c;
+    }
+    out.push(cur); return out;
+  }
+
+  const CSV_ALIAS_MAP = {};
+  Object.entries({
+    first_name:   ['first_name','first name','firstname','first','fname'],
+    last_name:    ['last_name','last name','lastname','last','surname','lname'],
+    email:        ['email','email address','e-mail','mail'],
+    phone:        ['phone','phone number','mobile','cell','telephone'],
+    policy_type:  ['policy_type','policy type','type','insurance type'],
+    renewal_date: ['renewal_date','renewal date','renewal','expiration','exp date'],
+    status:       ['status','client status'],
+    notes:        ['notes','note','comments'],
+    agency_id:    ['agency_id','agency id','agency'],
+  }).forEach(([field, aliases]) => aliases.forEach(a => CSV_ALIAS_MAP[a.toLowerCase()] = field));
+
+  function mapCsvColumns(raw) {
+    const record = {};
+    for (const [key, val] of Object.entries(raw)) {
+      const k = key.toLowerCase().trim();
+      const mapped = CSV_ALIAS_MAP[k];
+      if (mapped) { record[mapped] = val; }
+      else if (['name','full name','full_name','client name'].includes(k)) {
+        const parts = val.trim().split(/\s+/);
+        if (!record.first_name) record.first_name = parts[0]||'';
+        if (!record.last_name)  record.last_name  = parts.slice(1).join(' ')||'';
+      }
+    }
+    return record;
   }
 
   // --- EMAIL ---
