@@ -629,6 +629,151 @@
     .modal-save:disabled { opacity: 0.5; cursor: not-allowed; }
     .modal-err-msg { color: var(--red); font-size: 12px; margin-top: 10px; min-height: 16px; }
 
+    /* GMAIL PANEL */
+    .gmail-connect-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px 32px;
+      text-align: center;
+      max-width: 480px;
+    }
+    .gmail-connect-box h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .gmail-connect-box p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+    .connect-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 10px; padding: 13px 28px;
+      font-size: 14px; font-weight: 600; font-family: 'Syne', sans-serif;
+      cursor: pointer; text-decoration: none;
+      box-shadow: 0 4px 16px var(--accent-glow);
+      transition: opacity 0.2s;
+    }
+    .connect-btn:hover { opacity: 0.9; }
+
+    .gmail-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+    }
+    .gmail-header h2 {
+      font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700;
+    }
+    .gmail-status { font-size: 13px; color: var(--muted); }
+    .gmail-status.connected { color: var(--green); }
+
+    .refresh-btn {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 8px 16px;
+      font-size: 13px; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .gmail-section-title {
+      font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--muted); margin: 24px 0 10px;
+    }
+    .attention-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--red); color: #fff;
+      border-radius: 20px; padding: 2px 8px;
+      font-size: 11px; font-weight: 600; margin-left: 8px;
+    }
+
+    .email-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .email-card:hover { border-color: var(--accent); }
+    .email-card.flagged { border-left: 3px solid var(--red); }
+    .email-card.auto { border-left: 3px solid var(--green); }
+    .email-card.sent { opacity: 0.55; }
+
+    .email-card-header {
+      padding: 14px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; gap: 12px;
+    }
+    .email-card-left { flex: 1; min-width: 0; }
+    .email-from {
+      font-weight: 600; font-size: 14px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .email-subject {
+      font-size: 13px; color: var(--muted); margin-top: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .email-card-right { text-align: right; flex-shrink: 0; }
+    .email-date { font-size: 12px; color: var(--muted); }
+    .email-ai-label {
+      font-size: 11px; font-weight: 600; margin-top: 3px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .email-ai-label.flag { color: var(--red); }
+    .email-ai-label.auto { color: var(--green); }
+
+    .email-card-body {
+      display: none;
+      padding: 0 18px 18px;
+      border-top: 1px solid var(--border);
+    }
+    .email-card-body.open { display: block; }
+
+    .email-reason {
+      font-size: 12px; color: var(--yellow);
+      background: rgba(251,191,36,0.08);
+      border: 1px solid rgba(251,191,36,0.2);
+      border-radius: 8px; padding: 8px 12px; margin: 12px 0;
+    }
+    .email-body-text {
+      font-size: 13px; color: var(--muted);
+      max-height: 120px; overflow-y: auto;
+      background: var(--bg); border-radius: 8px;
+      padding: 10px 12px; margin-bottom: 14px;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .draft-label {
+      font-size: 11px; font-weight: 500; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+    }
+    .draft-textarea {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px; font-size: 13px;
+      font-family: 'DM Sans', sans-serif; color: var(--text);
+      outline: none; resize: vertical; min-height: 100px;
+      transition: border-color 0.2s;
+    }
+    .draft-textarea:focus { border-color: var(--accent); }
+    .email-actions {
+      display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+    }
+    .send-reply-btn {
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 8px; padding: 9px 20px; font-size: 13px;
+      font-weight: 600; font-family: 'Syne', sans-serif;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .send-reply-btn:hover { opacity: 0.9; }
+    .send-reply-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .dismiss-btn {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); border-radius: 8px; padding: 9px 16px;
+      font-size: 13px; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .dismiss-btn:hover { border-color: var(--muted); color: var(--text); }
+
     /* MOBILE scroll hint */
     .scroll-hint {
       display: none;
@@ -675,6 +820,10 @@
       <button class="nav-item" data-panel="email" onclick="switchPanel('email', this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         Send Email
+      </button>
+      <button class="nav-item" data-panel="gmail" onclick="switchPanel('gmail', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.98-.98a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Gmail Inbox
       </button>
     </nav>
     <div class="sidebar-footer">
@@ -846,6 +995,13 @@
         </div>
         <button class="send-btn" id="sendBtn" onclick="sendEmail()">Send Email</button>
         <div class="msg" id="emailMsg"></div>
+      </div>
+    </div>
+
+    <!-- GMAIL PANEL -->
+    <div class="panel" id="panel-gmail">
+      <div id="gmailContent">
+        <div class="empty-state"><div class="icon">⏳</div>Loading Gmail...</div>
       </div>
     </div>
 
@@ -1407,6 +1563,7 @@
     btn.classList.add('active');
     document.getElementById('panel-' + name).classList.add('active');
     if (window.innerWidth < 768) toggleSidebar(false);
+    if (name === 'gmail' && !gmailLoaded) loadGmail();
   }
 
   function toggleSidebar(force) {
@@ -1415,6 +1572,201 @@
     const open = force !== undefined ? force : !sidebar.classList.contains('open');
     sidebar.classList.toggle('open', open);
     overlay.classList.toggle('open', open);
+  }
+
+  // --- GMAIL ---
+  let gmailLoaded = false;
+
+  async function loadGmail() {
+    const container = document.getElementById('gmailContent');
+    container.innerHTML = '<div class="empty-state"><div class="icon">⏳</div>Checking Gmail connection...</div>';
+
+    try {
+      const res = await fetch('/api/gmail-inbox');
+
+      if (res.status === 401) {
+        // Not connected — show connect button
+        container.innerHTML = `
+          <div class="gmail-connect-box">
+            <h2>Connect Gmail</h2>
+            <p>Connect the agency Gmail account to start reading and handling emails with AI.</p>
+            <a class="connect-btn" href="/api/gmail-auth">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Connect Gmail Account
+            </a>
+          </div>`;
+        return;
+      }
+
+      const { emails, error } = await res.json();
+      if (error) throw new Error(error);
+
+      renderGmailInbox(emails || []);
+      gmailLoaded = true;
+
+    } catch (err) {
+      container.innerHTML = `<div class="empty-state"><div class="icon">⚠</div>Error: ${esc(err.message)}</div>`;
+    }
+  }
+
+  function renderGmailInbox(emails) {
+    const container = document.getElementById('gmailContent');
+
+    const flagged = emails.filter(e => e.ai_classification === 'needs_attention' && e.status !== 'dismissed');
+    const auto    = emails.filter(e => e.ai_classification === 'auto_handle');
+    const sent    = emails.filter(e => e.status === 'sent');
+
+    let html = `
+      <div class="gmail-header">
+        <div>
+          <h2>Gmail Inbox</h2>
+          <div class="gmail-status connected">Connected</div>
+        </div>
+        <button class="refresh-btn" id="gmailRefreshBtn" onclick="refreshGmail()">Refresh</button>
+      </div>`;
+
+    // Needs Attention
+    html += `<div class="gmail-section-title">
+      Needs Your Attention
+      ${flagged.length > 0 ? `<span class="attention-badge">${flagged.length}</span>` : ''}
+    </div>`;
+
+    if (flagged.length === 0) {
+      html += `<div class="empty-state" style="padding:24px 20px;"><div class="icon">✅</div>All clear — nothing needs your attention right now.</div>`;
+    } else {
+      flagged.forEach(email => { html += buildEmailCard(email, true); });
+    }
+
+    // Auto-handled
+    if (auto.length > 0) {
+      html += `<div class="gmail-section-title">AI Auto-Handled (${auto.length})</div>`;
+      auto.forEach(email => { html += buildEmailCard(email, false); });
+    }
+
+    // Sent
+    if (sent.length > 0) {
+      html += `<div class="gmail-section-title">Sent (${sent.length})</div>`;
+      sent.forEach(email => { html += buildEmailCard(email, false); });
+    }
+
+    container.innerHTML = html;
+
+    // Attach card toggle listeners
+    container.querySelectorAll('.email-card-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const body = header.nextElementSibling;
+        body.classList.toggle('open');
+      });
+    });
+
+    // Attach send buttons
+    container.querySelectorAll('.send-reply-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const card     = btn.closest('.email-card');
+        const emailId  = card.dataset.id;
+        const to       = card.dataset.from;
+        const subject  = 'Re: ' + card.dataset.subject;
+        const body     = card.querySelector('.draft-textarea').value.trim();
+
+        if (!body) { alert('Please write a reply first.'); return; }
+
+        btn.disabled = true; btn.textContent = 'Sending…';
+        try {
+          const res = await fetch('/api/gmail-send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ to, subject, body, emailId }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error);
+          card.classList.add('sent');
+          btn.textContent = '✓ Sent';
+        } catch (err) {
+          btn.disabled = false; btn.textContent = 'Send Reply';
+          alert('Send failed: ' + err.message);
+        }
+      });
+    });
+
+    // Attach dismiss buttons
+    container.querySelectorAll('.dismiss-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const card    = btn.closest('.email-card');
+        const emailId = card.dataset.id;
+        if (emailId) {
+          await fetch(`/api/gmail-dismiss`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emailId }),
+          });
+        }
+        card.style.opacity = '0';
+        card.style.transition = 'opacity 0.3s';
+        setTimeout(() => card.remove(), 300);
+      });
+    });
+  }
+
+  function buildEmailCard(email, expandable) {
+    const isFlag  = email.ai_classification === 'needs_attention';
+    const isSent  = email.status === 'sent';
+    const cardCls = isSent ? 'sent' : isFlag ? 'flagged' : 'auto';
+    const label   = isSent ? 'Sent' : isFlag ? '⚑ Flag' : '✓ Auto';
+    const labelCls = isFlag ? 'flag' : 'auto';
+
+    // Parse display name from "Name <email@>" format
+    const fromMatch = (email.from || email.from_email || '').match(/^(.+?)\s*<(.+)>$/);
+    const fromName  = fromMatch ? fromMatch[1].replace(/"/g,'') : (email.from || email.from_email || '');
+    const fromEmail = fromMatch ? fromMatch[2] : (email.from || email.from_email || '');
+    const dateStr   = email.date ? new Date(email.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) :
+                      email.received_at ? new Date(email.received_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+
+    return `
+      <div class="email-card ${cardCls}" data-id="${esc(email.id||'')}" data-from="${esc(fromEmail)}" data-subject="${esc(email.subject||'')}">
+        <div class="email-card-header">
+          <div class="email-card-left">
+            <div class="email-from">${esc(fromName || fromEmail)}</div>
+            <div class="email-subject">${esc(email.subject || '(no subject)')}</div>
+          </div>
+          <div class="email-card-right">
+            <div class="email-date">${dateStr}</div>
+            <div class="email-ai-label ${labelCls}">${label}</div>
+          </div>
+        </div>
+        <div class="email-card-body">
+          ${email.ai_reason ? `<div class="email-reason">AI: ${esc(email.ai_reason)}</div>` : ''}
+          ${email.body || email.snippet ? `<div class="email-body-text">${esc((email.body || email.snippet || '').slice(0, 600))}</div>` : ''}
+          ${!isSent && email.ai_draft_reply ? `
+            <div class="draft-label">AI Draft Reply</div>
+            <textarea class="draft-textarea">${esc(email.ai_draft_reply)}</textarea>
+            <div class="email-actions">
+              <button class="send-reply-btn">Send Reply</button>
+              <button class="dismiss-btn">Dismiss</button>
+            </div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  async function refreshGmail() {
+    const btn = document.getElementById('gmailRefreshBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Refreshing…'; }
+    gmailLoaded = false;
+    await loadGmail();
+  }
+
+  // Check URL params for gmail_connected / gmail_error after OAuth redirect
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('gmail_connected') === '1') {
+    history.replaceState({}, '', '/dashboard.html');
+    // Auto-switch to Gmail panel
+    const gmailBtn = document.querySelector('[data-panel="gmail"]');
+    if (gmailBtn) switchPanel('gmail', gmailBtn);
+  }
+  if (urlParams.get('gmail_error')) {
+    alert('Gmail connection failed: ' + urlParams.get('gmail_error'));
+    history.replaceState({}, '', '/dashboard.html');
   }
 
   // --- UTILS ---
