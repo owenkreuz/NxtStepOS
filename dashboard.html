@@ -1612,9 +1612,10 @@
   function renderGmailInbox(emails) {
     const container = document.getElementById('gmailContent');
 
-    const flagged = emails.filter(e => e.ai_classification === 'needs_attention' && e.status !== 'dismissed');
-    const auto    = emails.filter(e => e.ai_classification === 'auto_handle');
-    const sent    = emails.filter(e => e.status === 'sent');
+    const flagged  = emails.filter(e => e.ai_classification === 'needs_attention' && e.status !== 'dismissed');
+    const auto     = emails.filter(e => e.ai_classification === 'auto_handle');
+    const noReply  = emails.filter(e => e.ai_classification === 'no_reply');
+    const sent     = emails.filter(e => e.status === 'sent');
 
     let html = `
       <div class="gmail-header">
@@ -1641,6 +1642,12 @@
     if (auto.length > 0) {
       html += `<div class="gmail-section-title">AI Auto-Handled (${auto.length})</div>`;
       auto.forEach(email => { html += buildEmailCard(email, false); });
+    }
+
+    // No reply needed
+    if (noReply.length > 0) {
+      html += `<div class="gmail-section-title">No Reply Needed (${noReply.length})</div>`;
+      noReply.forEach(email => { html += buildEmailCard(email, false); });
     }
 
     // Sent
@@ -1710,11 +1717,12 @@
   }
 
   function buildEmailCard(email, expandable) {
-    const isFlag  = email.ai_classification === 'needs_attention';
-    const isSent  = email.status === 'sent';
-    const cardCls = isSent ? 'sent' : isFlag ? 'flagged' : 'auto';
-    const label   = isSent ? 'Sent' : isFlag ? '⚑ Flag' : '✓ Auto';
-    const labelCls = isFlag ? 'flag' : 'auto';
+    const isFlag    = email.ai_classification === 'needs_attention';
+    const isNoReply = email.ai_classification === 'no_reply';
+    const isSent    = email.status === 'sent';
+    const cardCls   = isSent ? 'sent' : isFlag ? 'flagged' : 'auto';
+    const label     = isSent ? 'Sent' : isFlag ? '⚑ Flag' : isNoReply ? '— No reply' : '✓ Auto';
+    const labelCls  = isFlag ? 'flag' : 'auto';
 
     // Parse display name from "Name <email@>" format
     const fromMatch = (email.from || email.from_email || '').match(/^(.+?)\s*<(.+)>$/);
@@ -1738,13 +1746,14 @@
         <div class="email-card-body">
           ${email.ai_reason ? `<div class="email-reason">AI: ${esc(email.ai_reason)}</div>` : ''}
           ${email.body || email.snippet ? `<div class="email-body-text">${esc((email.body || email.snippet || '').slice(0, 600))}</div>` : ''}
-          ${!isSent && email.ai_draft_reply ? `
+          ${!isSent && !isNoReply && email.ai_draft_reply ? `
             <div class="draft-label">AI Draft Reply</div>
             <textarea class="draft-textarea">${esc(email.ai_draft_reply)}</textarea>
             <div class="email-actions">
               <button class="send-reply-btn">Send Reply</button>
               <button class="dismiss-btn">Dismiss</button>
             </div>` : ''}
+          ${isNoReply ? `<div class="email-actions"><button class="dismiss-btn">Dismiss</button></div>` : ''}
         </div>
       </div>`;
   }

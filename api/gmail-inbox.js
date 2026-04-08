@@ -138,9 +138,9 @@ export default async function handler(req, res) {
             max_tokens: 1024,
             messages: [{
               role:    'user',
-              content: `You are an AI assistant for an independent insurance agency specializing in Commercial and Life insurance.
+              content: `You are an AI assistant for an independent insurance agency specializing in Commercial and Life insurance. The agent's name is Bryan.
 
-Classify this email and write a professional draft reply.
+Classify this incoming email into exactly one of three categories and write a draft reply only when appropriate.
 
 From: ${email.from}
 Subject: ${email.subject}
@@ -148,13 +148,17 @@ Message: ${content}
 
 Respond with valid JSON only (no markdown, no code fences):
 {
-  "classification": "auto_handle",
+  "classification": "needs_attention",
   "reason": "one sentence explaining why",
-  "draft_reply": "professional email reply ready to send"
+  "draft_reply": "professional email reply, or empty string if no reply needed"
 }
 
-Use "needs_attention" if: client wants to cancel, complaint, claims, large policy changes, payment disputes, significant money, or requires human judgement.
-Use "auto_handle" if: general question, coverage inquiry, renewal acknowledgment, thank you, basic info request, or scheduling.`,
+Classification rules:
+- "needs_attention" — client wants to cancel, complaint, claim, large policy change, payment dispute, anything involving significant money, or any situation requiring Bryan's judgement
+- "auto_handle" — genuine question that has a clear answer, coverage inquiry, scheduling request, basic info request where a reply is appropriate
+- "no_reply" — acknowledgments, thank you emails, out of office replies, prospects saying "we'll review and get back to you", FYI updates, anything where no response is expected or needed
+
+For "no_reply", set draft_reply to an empty string.`,
             }],
           }),
         });
