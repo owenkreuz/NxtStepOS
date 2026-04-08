@@ -68,7 +68,7 @@ export default async function handler(req, res) {
   try {
     // List unread emails (last 25)
     const listRes = await fetch(
-      'https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=25&q=is:unread',
+      'https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=10&q=is:unread',
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
     const listData = await listRes.json();
@@ -104,8 +104,9 @@ export default async function handler(req, res) {
       };
     });
 
-    // Check which are already in DB, classify new ones with Claude
-    const results = await Promise.all(parsed.map(async (email) => {
+    // Check which are already in DB, classify new ones with Claude (sequentially to avoid timeout)
+    const results = [];
+    for (const email of parsed) {
       // Check if already classified
       const dbRes = await fetch(
         `${SUPABASE_URL}/rest/v1/emails?gmail_message_id=eq.${encodeURIComponent(email.gmail_id)}&select=*`,
@@ -114,7 +115,8 @@ export default async function handler(req, res) {
       const dbRows = await dbRes.json();
 
       if (dbRows && dbRows.length > 0) {
-        return { ...email, ...dbRows[0] };
+        results.push({ ...email, ...dbRows[0] });
+        continue;
       }
 
       // Classify with Claude
@@ -132,7 +134,7 @@ export default async function handler(req, res) {
             'anthropic-version': '2023-06-01',
           },
           body: JSON.stringify({
-            model:      'claude-sonnet-4-20250514',
+            model:      'claude-sonnet-4-6',
             max_tokens: 1024,
             messages: [{
               role:    'user',
@@ -144,25 +146,27 @@ From: ${email.from}
 Subject: ${email.subject}
 Message: ${content}
 
-Respond with valid JSON only:
+Respond with valid JSON only (no markdown, no code fences):
 {
-  "classification": "auto_handle" or "needs_attention",
+  "classification": "auto_handle",
   "reason": "one sentence explaining why",
   "draft_reply": "professional email reply ready to send"
 }
 
-Flag as needs_attention if: client wants to cancel, complaint or upset client, claims, large policy changes, payment disputes, anything involving significant money, or any situation requiring human judgement.
-
-Auto-handle if: general question with a clear answer, coverage inquiry, renewal acknowledgment, thank you email, basic info request, or scheduling.`,
+Use "needs_attention" if: client wants to cancel, complaint, claims, large policy changes, payment disputes, significant money, or requires human judgement.
+Use "auto_handle" if: general question, coverage inquiry, renewal acknowledgment, thank you, basic info request, or scheduling.`,
             }],
           }),
         });
 
         const claudeData = await claudeRes.json();
-        const parsed = JSON.parse(claudeData.content[0].text);
-        classification = parsed.classification;
-        ai_reason      = parsed.reason;
-        ai_draft_reply = parsed.draft_reply;
+        const rawText = claudeData.content?.[0]?.text || '';
+        // Strip markdown code fences if present
+        const jsonText = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        const parsed2 = JSON.parse(jsonText);
+        classification = parsed2.classification;
+        ai_reason      = parsed2.reason;
+        ai_draft_reply = parsed2.draft_reply;
       } catch (e) {
         console.error('Claude classification error:', e);
       }
@@ -187,8 +191,8 @@ Auto-handle if: general question with a clear answer, coverage inquiry, renewal 
       const inserted = await insertRes.json();
       const row = Array.isArray(inserted) ? inserted[0] : inserted;
 
-      return { ...email, id: row?.id, ai_classification: classification, ai_reason, ai_draft_reply, status: 'pending' };
-    }));
+      results.push({ ...email, id: row?.id, ai_classification: classification, ai_reason, ai_draft_reply, status: 'pending' });
+    }
 
     return res.status(200).json({ emails: results });
 
