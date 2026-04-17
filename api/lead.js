@@ -117,6 +117,42 @@ export default async function handler(req, res) {
       console.log('NOTIFY EMAIL RESPONSE:', JSON.stringify(notifyData));
     }
 
+    // Step 5 — Auto-enroll lead in follow-up sequence
+    if (supabaseUrl && supabaseKey) {
+      try {
+        const seqRes = await fetch(
+          `${supabaseUrl}/rest/v1/sequences?active=eq.true&select=id&limit=1`,
+          { headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` } }
+        );
+        const sequences = await seqRes.json();
+        if (sequences && sequences.length > 0) {
+          const nextSendAt = new Date();
+          nextSendAt.setDate(nextSendAt.getDate() + 1); // Step 1 sends tomorrow
+          await fetch(`${supabaseUrl}/rest/v1/lead_sequences`, {
+            method: 'POST',
+            headers: {
+              'Content-Type':  'application/json',
+              'apikey':        supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Prefer':        'return=minimal',
+            },
+            body: JSON.stringify({
+              lead_email:          email,
+              lead_name:           name,
+              lead_insurance_type: type,
+              sequence_id:         sequences[0].id,
+              current_step:        1,
+              status:              'active',
+              next_send_at:        nextSendAt.toISOString(),
+            }),
+          });
+          console.log('Lead enrolled in follow-up sequence:', email);
+        }
+      } catch (seqErr) {
+        console.error('Sequence enrollment failed:', seqErr);
+      }
+    }
+
     return res.status(200).json({ success: true });
 
   } catch (error) {
