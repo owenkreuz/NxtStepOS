@@ -1563,7 +1563,12 @@
     btn.classList.add('active');
     document.getElementById('panel-' + name).classList.add('active');
     if (window.innerWidth < 768) toggleSidebar(false);
-    if (name === 'gmail' && !gmailLoaded) loadGmail();
+    if (name === 'gmail') {
+      if (!gmailLoaded) loadGmail();
+      startGmailPolling();
+    } else {
+      stopGmailPolling();
+    }
   }
 
   function toggleSidebar(force) {
@@ -1617,11 +1622,12 @@
     const noReply  = emails.filter(e => e.ai_classification === 'no_reply');
     const sent     = emails.filter(e => e.status === 'sent');
 
+    const lastChecked = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     let html = `
       <div class="gmail-header">
         <div>
           <h2>Gmail Inbox</h2>
-          <div class="gmail-status connected">Connected</div>
+          <div class="gmail-status connected">Connected · Last checked ${lastChecked}</div>
         </div>
         <button class="refresh-btn" id="gmailRefreshBtn" onclick="refreshGmail()">Refresh</button>
       </div>`;
@@ -1763,6 +1769,24 @@
     if (btn) { btn.disabled = true; btn.textContent = 'Refreshing…'; }
     gmailLoaded = false;
     await loadGmail();
+  }
+
+  // Auto-refresh every 60 seconds when Gmail panel is active
+  let gmailPollInterval = null;
+
+  function startGmailPolling() {
+    stopGmailPolling();
+    gmailPollInterval = setInterval(async () => {
+      const panel = document.getElementById('panel-gmail');
+      if (panel && panel.classList.contains('active')) {
+        gmailLoaded = false;
+        await loadGmail();
+      }
+    }, 60000);
+  }
+
+  function stopGmailPolling() {
+    if (gmailPollInterval) { clearInterval(gmailPollInterval); gmailPollInterval = null; }
   }
 
   // Check URL params for gmail_connected / gmail_error after OAuth redirect
