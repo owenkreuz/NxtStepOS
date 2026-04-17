@@ -1065,6 +1065,16 @@
 
     <!-- RENEWALS PANEL -->
     <div class="panel" id="panel-renewals">
+
+      <!-- Automation status bar -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;">Renewal Automation <span style="color:var(--green);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:400;margin-left:6px;">● Active</span></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px;">Clients get reminder emails at 90, 60, and 30 days before renewal — automatically.</div>
+        </div>
+        <div id="renewalAutoStats" style="font-size:13px;color:var(--muted);">Loading...</div>
+      </div>
+
       <div id="renewalsBody">
         <div class="empty-state"><div class="icon">⏳</div>Loading renewals...</div>
       </div>
@@ -1670,6 +1680,7 @@
       stopGmailPolling();
     }
     if (name === 'sequences' && !sequencesLoaded) loadSequences();
+    if (name === 'renewals') loadRenewalStats();
   }
 
   function toggleSidebar(force) {
@@ -1678,6 +1689,27 @@
     const open = force !== undefined ? force : !sidebar.classList.contains('open');
     sidebar.classList.toggle('open', open);
     overlay.classList.toggle('open', open);
+  }
+
+  // --- RENEWAL AUTOMATION ---
+  async function loadRenewalStats() {
+    const el = document.getElementById('renewalAutoStats');
+    if (!el) return;
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/renewal_reminders?select=id,days_before,sent_at&order=sent_at.desc&limit=100`,
+        { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
+      );
+      const rows = await res.json();
+      if (!rows || rows.length === 0) {
+        el.textContent = 'No reminders sent yet';
+        return;
+      }
+      const last = new Date(rows[0].sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      el.innerHTML = `<span style="color:var(--text);font-weight:600;">${rows.length}</span> reminders sent &nbsp;·&nbsp; Last: ${last}`;
+    } catch (e) {
+      el.textContent = '';
+    }
   }
 
   // --- SEQUENCES ---
