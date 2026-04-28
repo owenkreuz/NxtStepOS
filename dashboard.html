@@ -1596,7 +1596,7 @@
         <button class="ai-close" id="aiClose">✕</button>
       </div>
       <div class="ai-messages" id="aiMessages">
-        <div class="ai-msg agent">Hey Bryan! I'm your AI assistant. Ask me anything — coverage questions, client situations, what to say on a call, or how to use the dashboard.</div>
+        <div class="ai-msg agent" id="aiGreeting">Hey! I'm your AI assistant. Ask me anything — coverage questions, client situations, what to say on a call, or how to use the dashboard.</div>
       </div>
       <div class="ai-input-row">
         <input class="ai-input" id="aiInput" type="text" placeholder="Ask anything…" />
@@ -1628,6 +1628,14 @@
     document.getElementById('authGuard').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     document.getElementById('userEmail').textContent = session.user.email;
+
+    // Personalize AI greeting with first name from email
+    const firstName = (session.user.user_metadata?.full_name || session.user.email || '').split(/[\s@]/)[0];
+    const greeting = document.getElementById('aiGreeting');
+    if (greeting && firstName) {
+      greeting.textContent = `Hey ${firstName}! I'm your AI assistant. Ask me anything — coverage questions, client situations, what to say on a call, or how to use the dashboard.`;
+    }
+
     loadAll();
   }
 
@@ -2840,6 +2848,12 @@
     let history    = [];
     let busy       = false;
 
+    // Pick up agent name set by init()
+    function getAgentName() {
+      const email = document.getElementById('userEmail')?.textContent || '';
+      return email.split(/[\s@]/)[0] || 'the agent';
+    }
+
     function openAI()  { window_.classList.add('open'); input.focus(); toggle.querySelector('.ai-pulse').style.display = 'none'; }
     function closeAI() { window_.classList.remove('open'); }
 
@@ -2880,7 +2894,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             messages: history,
-            systemContext: 'You are an AI assistant built into the NxtStepOS dashboard. The user is Bryan, an independent insurance agent specializing in Commercial and Life insurance. Help him with coverage questions, client situations, how to handle emails, what to say on calls, or anything about running his agency. Be concise, practical, and direct. You also know about the NxtStepOS dashboard features: Gmail inbox with AI classification, lead follow-up sequences, renewal reminders, proposal generator, and client management.'
+            systemContext: `You are an AI assistant built into the NxtStepOS dashboard. The user is ${getAgentName()}, an independent insurance agent specializing in Commercial and Life insurance. Help them with coverage questions, client situations, how to handle emails, what to say on calls, or anything about running their agency. Be concise, practical, and direct. You also know about the NxtStepOS dashboard features: Gmail inbox with AI classification, lead follow-up sequences, renewal reminders, proposal generator, and client management.`
           }),
         });
         const data = await res.json();
