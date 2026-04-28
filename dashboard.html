@@ -629,6 +629,132 @@
     .modal-save:disabled { opacity: 0.5; cursor: not-allowed; }
     .modal-err-msg { color: var(--red); font-size: 12px; margin-top: 10px; min-height: 16px; }
 
+    /* PROPOSALS PANEL */
+    .proposal-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media(max-width: 900px) {
+      .proposal-layout { grid-template-columns: 1fr; }
+    }
+    .proposal-form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      position: sticky;
+      top: 20px;
+    }
+    .proposal-form-card h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+    .proposal-field { margin-bottom: 14px; }
+    .proposal-field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+    }
+    .proposal-field input,
+    .proposal-field textarea,
+    .proposal-field select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 13px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+      resize: vertical;
+    }
+    .proposal-field input:focus,
+    .proposal-field textarea:focus { border-color: var(--accent); }
+    .proposal-field textarea { min-height: 80px; }
+    .generate-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      box-shadow: 0 4px 16px var(--accent-glow);
+      margin-top: 4px;
+    }
+    .generate-btn:hover { opacity: 0.9; }
+    .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .proposal-preview {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      min-height: 400px;
+    }
+    .proposal-preview-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 400px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+    .proposal-preview-empty .icon { font-size: 40px; margin-bottom: 12px; }
+    .proposal-text {
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+    }
+    .proposal-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .download-btn {
+      background: var(--green);
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .download-btn:hover { opacity: 0.85; }
+    .copy-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
     /* SEQUENCES PANEL */
     .seq-stats {
       display: grid;
@@ -910,6 +1036,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         Send Email
       </button>
+      <button class="nav-item" data-panel="proposals" onclick="switchPanel('proposals', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Proposals
+      </button>
       <button class="nav-item" data-panel="sequences" onclick="switchPanel('sequences', this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
         Sequences
@@ -1098,6 +1228,54 @@
         </div>
         <button class="send-btn" id="sendBtn" onclick="sendEmail()">Send Email</button>
         <div class="msg" id="emailMsg"></div>
+      </div>
+    </div>
+
+    <!-- PROPOSALS PANEL -->
+    <div class="panel" id="panel-proposals">
+      <div class="page-header" style="margin-bottom:20px;">
+        <h1 style="font-size:22px;">Proposal Generator</h1>
+        <p>Fill in the details — AI writes a complete professional proposal in seconds.</p>
+      </div>
+      <div class="proposal-layout">
+        <!-- Form -->
+        <div class="proposal-form-card">
+          <h2>Client Details</h2>
+          <div class="proposal-field">
+            <label>Client Name *</label>
+            <input type="text" id="propClientName" placeholder="John Smith" />
+          </div>
+          <div class="proposal-field">
+            <label>Business Name</label>
+            <input type="text" id="propBusinessName" placeholder="Smith Contracting LLC" />
+          </div>
+          <div class="proposal-field">
+            <label>Business Type</label>
+            <input type="text" id="propBusinessType" placeholder="General contractor, restaurant, etc." />
+          </div>
+          <div class="proposal-field">
+            <label>Coverage Needed *</label>
+            <input type="text" id="propCoverageTypes" placeholder="General liability, workers comp, commercial auto…" />
+          </div>
+          <div class="proposal-field">
+            <label>Notes / Special Circumstances</label>
+            <textarea id="propNotes" placeholder="Any specific limits, prior claims, unique risks…"></textarea>
+          </div>
+          <div class="proposal-field">
+            <label>Agent Name</label>
+            <input type="text" id="propAgentName" placeholder="Bryan" value="Bryan" />
+          </div>
+          <button class="generate-btn" id="generateBtn" onclick="generateProposal()">Generate Proposal</button>
+          <div class="modal-err-msg" id="proposalErr"></div>
+        </div>
+
+        <!-- Preview -->
+        <div class="proposal-preview" id="proposalPreview">
+          <div class="proposal-preview-empty">
+            <div class="icon">📄</div>
+            <div>Fill in the form and click Generate<br>to create a proposal.</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1689,6 +1867,93 @@
     const open = force !== undefined ? force : !sidebar.classList.contains('open');
     sidebar.classList.toggle('open', open);
     overlay.classList.toggle('open', open);
+  }
+
+  // --- PROPOSALS ---
+  async function generateProposal() {
+    const clientName   = document.getElementById('propClientName').value.trim();
+    const businessName = document.getElementById('propBusinessName').value.trim();
+    const businessType = document.getElementById('propBusinessType').value.trim();
+    const coverageTypes = document.getElementById('propCoverageTypes').value.trim();
+    const notes        = document.getElementById('propNotes').value.trim();
+    const agentName    = document.getElementById('propAgentName').value.trim();
+    const errEl        = document.getElementById('proposalErr');
+    const btn          = document.getElementById('generateBtn');
+    const preview      = document.getElementById('proposalPreview');
+
+    errEl.textContent = '';
+    if (!clientName || !coverageTypes) {
+      errEl.textContent = 'Client name and coverage needed are required.';
+      return;
+    }
+
+    btn.disabled = true; btn.textContent = 'Generating…';
+    preview.innerHTML = '<div class="proposal-preview-empty"><div class="icon">⏳</div><div>Writing your proposal…</div></div>';
+
+    try {
+      const res = await fetch('/api/generate-proposal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_name:    clientName,
+          business_name:  businessName,
+          business_type:  businessType,
+          coverage_types: coverageTypes,
+          coverage_notes: notes,
+          agent_name:     agentName,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      preview.innerHTML = `
+        <div class="proposal-actions">
+          <button class="download-btn" onclick="downloadProposal()">Download PDF</button>
+          <button class="copy-btn" onclick="copyProposal()">Copy Text</button>
+        </div>
+        <div class="proposal-text" id="proposalText">${esc(data.proposal)}</div>`;
+
+    } catch (err) {
+      errEl.textContent = 'Error: ' + err.message;
+      preview.innerHTML = '<div class="proposal-preview-empty"><div class="icon">⚠</div><div>Something went wrong. Try again.</div></div>';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Generate Proposal';
+    }
+  }
+
+  function copyProposal() {
+    const text = document.getElementById('proposalText')?.innerText;
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    const btn = document.querySelector('.copy-btn');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = 'Copy Text', 2000); }
+  }
+
+  function downloadProposal() {
+    const clientName = document.getElementById('propClientName').value.trim() || 'proposal';
+    const text = document.getElementById('proposalText')?.innerText;
+    if (!text) return;
+
+    // Build a minimal printable HTML page and open in new tab for Save as PDF
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insurance Proposal — ${clientName}</title>
+<style>
+  body { font-family: Georgia, serif; max-width: 720px; margin: 60px auto; color: #111; line-height: 1.8; font-size: 15px; }
+  pre { white-space: pre-wrap; font-family: inherit; }
+</style>
+</head>
+<body><pre>${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre></body>
+</html>`;
+
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 500);
   }
 
   // --- RENEWAL AUTOMATION ---
