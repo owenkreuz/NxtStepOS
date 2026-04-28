@@ -629,6 +629,102 @@
     .modal-save:disabled { opacity: 0.5; cursor: not-allowed; }
     .modal-err-msg { color: var(--red); font-size: 12px; margin-top: 10px; min-height: 16px; }
 
+    /* COVERAGE Q&A */
+    .qa-wrap { max-width: 720px; }
+    .qa-input-row {
+      display: flex; gap: 10px; margin-bottom: 24px;
+    }
+    .qa-input {
+      flex: 1;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+      font-size: 14px; font-family: 'DM Sans', sans-serif;
+      color: var(--text); outline: none; resize: none;
+      transition: border-color 0.2s; min-height: 56px;
+    }
+    .qa-input:focus { border-color: var(--accent); }
+    .qa-ask-btn {
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 12px; padding: 14px 24px;
+      font-size: 14px; font-weight: 600; font-family: 'Syne', sans-serif;
+      cursor: pointer; white-space: nowrap; transition: opacity 0.2s;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+    .qa-ask-btn:hover { opacity: 0.9; }
+    .qa-ask-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .qa-history { display: flex; flex-direction: column; gap: 16px; }
+    .qa-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+    }
+    .qa-question {
+      padding: 14px 18px;
+      background: var(--surface2);
+      font-weight: 600; font-size: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .qa-answer {
+      padding: 16px 18px;
+      font-size: 14px; line-height: 1.75;
+      white-space: pre-wrap; color: var(--text);
+    }
+    .qa-chips {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;
+    }
+    .qa-chip {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 6px 14px;
+      font-size: 12px; color: var(--muted); cursor: pointer;
+      transition: all 0.15s;
+    }
+    .qa-chip:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ANALYTICS */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    @media(max-width: 640px) { .analytics-grid { grid-template-columns: repeat(2, 1fr); } }
+    .an-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px;
+    }
+    .an-card-label {
+      font-size: 11px; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--muted); margin-bottom: 8px;
+    }
+    .an-card-value {
+      font-family: 'Syne', sans-serif; font-size: 30px;
+      font-weight: 800; letter-spacing: -1px; color: var(--accent);
+    }
+    .an-section {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px; margin-bottom: 16px;
+    }
+    .an-section h3 {
+      font-family: 'Syne', sans-serif; font-size: 14px;
+      font-weight: 700; margin-bottom: 16px; color: var(--text);
+    }
+    .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 100px; }
+    .bar-col { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 4px; height: 100%; justify-content: flex-end; }
+    .bar {
+      width: 100%; border-radius: 6px 6px 0 0;
+      background: var(--accent); opacity: 0.85;
+      transition: opacity 0.2s; min-height: 4px;
+    }
+    .bar:hover { opacity: 1; }
+    .bar-label { font-size: 11px; color: var(--muted); }
+    .bar-val { font-size: 11px; font-weight: 600; color: var(--text); }
+    .an-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+    }
+    .an-row:last-child { border-bottom: none; }
+    .an-row-label { color: var(--muted); }
+    .an-row-val { font-weight: 600; color: var(--text); }
+
     /* PROPOSALS PANEL */
     .proposal-layout {
       display: grid;
@@ -1036,6 +1132,14 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         Send Email
       </button>
+      <button class="nav-item" data-panel="qa" onclick="switchPanel('qa', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Coverage Q&A
+      </button>
+      <button class="nav-item" data-panel="analytics" onclick="switchPanel('analytics', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytics
+      </button>
       <button class="nav-item" data-panel="proposals" onclick="switchPanel('proposals', this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
         Proposals
@@ -1228,6 +1332,40 @@
         </div>
         <button class="send-btn" id="sendBtn" onclick="sendEmail()">Send Email</button>
         <div class="msg" id="emailMsg"></div>
+      </div>
+    </div>
+
+    <!-- COVERAGE Q&A PANEL -->
+    <div class="panel" id="panel-qa">
+      <div class="page-header" style="margin-bottom:20px;">
+        <h1 style="font-size:22px;">Coverage Q&A</h1>
+        <p>Ask any insurance question — get an instant expert answer.</p>
+      </div>
+      <div class="qa-wrap">
+        <div class="qa-chips" id="qaChips">
+          <span class="qa-chip">What does general liability cover?</span>
+          <span class="qa-chip">When is workers comp required?</span>
+          <span class="qa-chip">What is an umbrella policy?</span>
+          <span class="qa-chip">Difference between occurrence vs claims-made?</span>
+          <span class="qa-chip">What does E&O insurance cover?</span>
+          <span class="qa-chip">How does commercial auto differ from personal?</span>
+        </div>
+        <div class="qa-input-row">
+          <textarea class="qa-input" id="qaInput" placeholder="Ask a coverage question…" rows="1"></textarea>
+          <button class="qa-ask-btn" id="qaBtn" onclick="askCoverageQuestion()">Ask</button>
+        </div>
+        <div class="qa-history" id="qaHistory"></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS PANEL -->
+    <div class="panel" id="panel-analytics">
+      <div class="page-header" style="margin-bottom:20px;">
+        <h1 style="font-size:22px;">Analytics</h1>
+        <p>How the agency is performing across all channels.</p>
+      </div>
+      <div id="analyticsContent">
+        <div class="empty-state"><div class="icon">⏳</div>Loading analytics...</div>
       </div>
     </div>
 
@@ -1859,6 +1997,7 @@
     }
     if (name === 'sequences' && !sequencesLoaded) loadSequences();
     if (name === 'renewals') loadRenewalStats();
+    if (name === 'analytics' && !analyticsLoaded) loadAnalytics();
   }
 
   function toggleSidebar(force) {
@@ -1867,6 +2006,128 @@
     const open = force !== undefined ? force : !sidebar.classList.contains('open');
     sidebar.classList.toggle('open', open);
     overlay.classList.toggle('open', open);
+  }
+
+  // --- COVERAGE Q&A ---
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.qa-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.getElementById('qaInput').value = chip.textContent;
+        askCoverageQuestion();
+      });
+    });
+    document.getElementById('qaInput')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); askCoverageQuestion(); }
+    });
+  });
+
+  async function askCoverageQuestion() {
+    const input = document.getElementById('qaInput');
+    const question = input.value.trim();
+    if (!question) return;
+
+    const btn     = document.getElementById('qaBtn');
+    const history = document.getElementById('qaHistory');
+
+    btn.disabled = true; btn.textContent = 'Thinking…';
+
+    // Add question immediately
+    const item = document.createElement('div');
+    item.className = 'qa-item';
+    item.innerHTML = `<div class="qa-question">${esc(question)}</div><div class="qa-answer" style="color:var(--muted);">Thinking…</div>`;
+    history.insertBefore(item, history.firstChild);
+    input.value = '';
+
+    try {
+      const res = await fetch('/api/coverage-qa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      item.querySelector('.qa-answer').textContent = data.answer;
+    } catch (err) {
+      item.querySelector('.qa-answer').textContent = 'Error: ' + err.message;
+    } finally {
+      btn.disabled = false; btn.textContent = 'Ask';
+    }
+  }
+
+  // --- ANALYTICS ---
+  let analyticsLoaded = false;
+
+  async function loadAnalytics() {
+    const container = document.getElementById('analyticsContent');
+    try {
+      const res  = await fetch('/api/analytics');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      const t = data.totals;
+
+      // Build bar chart HTML
+      const leadsMax = Math.max(...data.leadsPerMonth.map(m => m.count), 1);
+      const leadsChart = data.leadsPerMonth.map(m => {
+        const h = Math.round((m.count / leadsMax) * 80);
+        return `<div class="bar-col">
+          <div class="bar-val">${m.count}</div>
+          <div class="bar" style="height:${h}px"></div>
+          <div class="bar-label">${m.label}</div>
+        </div>`;
+      }).join('');
+
+      const clientsMax = Math.max(...data.clientsPerMonth.map(m => m.count), 1);
+      const clientsChart = data.clientsPerMonth.map(m => {
+        const h = Math.round((m.count / clientsMax) * 80);
+        return `<div class="bar-col">
+          <div class="bar-val">${m.count}</div>
+          <div class="bar" style="height:${h}px;background:var(--green);"></div>
+          <div class="bar-label">${m.label}</div>
+        </div>`;
+      }).join('');
+
+      container.innerHTML = `
+        <div class="analytics-grid">
+          <div class="an-card"><div class="an-card-label">Total Leads</div><div class="an-card-value">${t.leads}</div></div>
+          <div class="an-card"><div class="an-card-label">Active Clients</div><div class="an-card-value" style="color:var(--green)">${t.active_clients}</div></div>
+          <div class="an-card"><div class="an-card-label">Renewals (90 days)</div><div class="an-card-value" style="color:var(--yellow)">${t.upcoming_renewals}</div></div>
+          <div class="an-card"><div class="an-card-label">Renewal Reminders Sent</div><div class="an-card-value">${t.reminders_sent}</div></div>
+          <div class="an-card"><div class="an-card-label">Sequences Active</div><div class="an-card-value">${data.seqActive}</div></div>
+          <div class="an-card"><div class="an-card-label">Emails Handled by AI</div><div class="an-card-value">${t.emails_handled}</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div class="an-section">
+            <h3>New Leads — Last 6 Months</h3>
+            <div class="bar-chart">${leadsChart}</div>
+          </div>
+          <div class="an-section">
+            <h3>New Clients — Last 6 Months</h3>
+            <div class="bar-chart">${clientsChart}</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="an-section">
+            <h3>Renewal Reminders Sent</h3>
+            <div class="an-row"><span class="an-row-label">90-day reminders</span><span class="an-row-val">${data.remindersByMilestone[90]}</span></div>
+            <div class="an-row"><span class="an-row-label">60-day reminders</span><span class="an-row-val">${data.remindersByMilestone[60]}</span></div>
+            <div class="an-row"><span class="an-row-label">30-day reminders</span><span class="an-row-val">${data.remindersByMilestone[30]}</span></div>
+          </div>
+          <div class="an-section">
+            <h3>Gmail AI Classification</h3>
+            <div class="an-row"><span class="an-row-label">Flagged for attention</span><span class="an-row-val" style="color:var(--red)">${data.emailStats.needs_attention}</span></div>
+            <div class="an-row"><span class="an-row-label">Auto-handled</span><span class="an-row-val" style="color:var(--green)">${data.emailStats.auto_handle}</span></div>
+            <div class="an-row"><span class="an-row-label">No reply needed</span><span class="an-row-val">${data.emailStats.no_reply}</span></div>
+            <div class="an-row"><span class="an-row-label">Replies sent</span><span class="an-row-val" style="color:var(--accent)">${data.emailStats.sent}</span></div>
+          </div>
+        </div>`;
+
+      analyticsLoaded = true;
+    } catch (err) {
+      container.innerHTML = `<div class="empty-state"><div class="icon">⚠</div>Error loading analytics: ${esc(err.message)}</div>`;
+    }
   }
 
   // --- PROPOSALS ---

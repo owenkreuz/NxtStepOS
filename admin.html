@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NxtStepOS — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --surface: #13131a; --surface2: #1a1a24;
+      --border: #1e1e2e; --accent: #4f6ef7; --accent-glow: rgba(79,110,247,0.2);
+      --green: #34d399; --yellow: #fbbf24; --red: #f87171;
+      --text: #eeeef2; --muted: #6b6b80;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: linear-gradient(rgba(79,110,247,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(79,110,247,0.03) 1px, transparent 1px);
+      background-size: 48px 48px; pointer-events: none; z-index: 0;
+    }
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,10,15,0.9); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; }
+    .logo span { color: var(--accent); }
+    .admin-badge {
+      background: var(--accent-glow); color: var(--accent);
+      border: 1px solid var(--accent); border-radius: 20px;
+      padding: 3px 10px; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.8px; margin-left: 10px;
+    }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); border-radius: 8px; padding: 7px 14px;
+      font-size: 13px; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; text-decoration: none; transition: all 0.2s;
+    }
+    .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    main { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; }
+
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; }
+    .page-header p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 14px; margin-bottom: 28px;
+    }
+    @media(max-width: 640px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px;
+    }
+    .stat-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 8px; }
+    .stat-value { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -1px; color: var(--accent); }
+
+    .section-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+
+    .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 28px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      padding: 12px 18px; text-align: left; font-size: 11px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+    tbody td { padding: 12px 18px; color: var(--text); }
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 500; text-transform: capitalize;
+    }
+    .badge-active { background: rgba(52,211,153,0.15); color: var(--green); }
+    .badge-trial  { background: rgba(79,110,247,0.15); color: var(--accent); }
+    .badge-new    { background: rgba(79,110,247,0.15); color: var(--accent); }
+
+    .empty-state { text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
+    .empty-state .icon { font-size: 32px; margin-bottom: 10px; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    main { animation: fadeUp 0.4s ease forwards; }
+  </style>
+</head>
+<body>
+<nav>
+  <div style="display:flex;align-items:center;">
+    <div class="logo">Nxt<span>Step</span>OS</div>
+    <span class="admin-badge">Admin</span>
+  </div>
+  <div class="nav-right">
+    <a class="back-btn" href="/dashboard.html">← Dashboard</a>
+  </div>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Admin Overview</h1>
+    <p>All agencies, leads, and platform usage at a glance.</p>
+  </div>
+
+  <div class="stats-grid" id="adminStats">
+    <div class="stat-card"><div class="stat-label">Total Agencies</div><div class="stat-value" id="statAgencies">—</div></div>
+    <div class="stat-card"><div class="stat-label">Total Leads</div><div class="stat-value" id="statLeads">—</div></div>
+    <div class="stat-card"><div class="stat-label">Total Clients</div><div class="stat-value" id="statClients">—</div></div>
+    <div class="stat-card"><div class="stat-label">Emails Handled</div><div class="stat-value" id="statEmails">—</div></div>
+  </div>
+
+  <div class="section-title">Agencies</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Agency</th>
+          <th>Owner</th>
+          <th>Email</th>
+          <th>Insurance Type</th>
+          <th>Plan</th>
+          <th>Status</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody id="agenciesBody">
+        <tr><td colspan="7"><div class="empty-state"><div class="icon">⏳</div>Loading...</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title">Recent Leads</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Agency</th>
+          <th>Email</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="leadsBody">
+        <tr><td colspan="6"><div class="empty-state"><div class="icon">⏳</div>Loading...</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+  const SUPABASE_URL     = 'https://vjdjtsfjjibhjufxggid.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqZGp0c2ZqamliaGp1ZnhnZ2lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NzI2NjQsImV4cCI6MjA4OTQ0ODY2NH0.eLAtNfyjGrGSKexRZ_N-RDL_u5QFlgZjbGpAfAlVmiA';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  function esc(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function formatDate(str) {
+    if (!str) return '—';
+    return new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  async function loadAdmin() {
+    const [
+      { data: agencies },
+      { data: leads },
+      { data: clients },
+      { data: emails },
+    ] = await Promise.all([
+      sb.from('agencies').select('*').order('created_at', { ascending: false }),
+      sb.from('leads').select('*').order('created_at', { ascending: false }).limit(50),
+      sb.from('clients').select('id'),
+      sb.from('emails').select('id'),
+    ]);
+
+    document.getElementById('statAgencies').textContent = (agencies || []).length;
+    document.getElementById('statLeads').textContent    = (leads    || []).length;
+    document.getElementById('statClients').textContent  = (clients  || []).length;
+    document.getElementById('statEmails').textContent   = (emails   || []).length;
+
+    // Agencies table
+    const ab = document.getElementById('agenciesBody');
+    if (!agencies || agencies.length === 0) {
+      ab.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="icon">🏢</div>No agencies yet.</div></td></tr>';
+    } else {
+      ab.innerHTML = agencies.map(a => `<tr>
+        <td><strong>${esc(a.agency_name || '—')}</strong></td>
+        <td>${esc(a.owner_name || '—')}</td>
+        <td><a href="mailto:${esc(a.email)}" style="color:var(--accent);text-decoration:none;">${esc(a.email || '—')}</a></td>
+        <td>${esc(a.insurance_type || '—')}</td>
+        <td>${esc(a.plan || 'trial')}</td>
+        <td><span class="badge badge-${a.status || 'trial'}">${esc(a.status || 'trial')}</span></td>
+        <td style="color:var(--muted);">${formatDate(a.created_at)}</td>
+      </tr>`).join('');
+    }
+
+    // Leads table
+    const lb = document.getElementById('leadsBody');
+    if (!leads || leads.length === 0) {
+      lb.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">📭</div>No leads yet.</div></td></tr>';
+    } else {
+      lb.innerHTML = leads.map(l => `<tr>
+        <td><strong>${esc(l.name || '—')}</strong></td>
+        <td>${esc(l.agency || '—')}</td>
+        <td><a href="mailto:${esc(l.email)}" style="color:var(--accent);text-decoration:none;">${esc(l.email || '—')}</a></td>
+        <td>${esc(l.insurance_type || '—')}</td>
+        <td><span class="badge badge-${l.status || 'new'}">${esc(l.status || 'new')}</span></td>
+        <td style="color:var(--muted);">${formatDate(l.created_at)}</td>
+      </tr>`).join('');
+    }
+  }
+
+  loadAdmin();
+</script>
+</body>
+</html>
