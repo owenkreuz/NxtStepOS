@@ -2041,10 +2041,10 @@
     input.value = '';
 
     try {
-      const res = await fetch('/api/coverage-qa', {
+      const res = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ action: 'qa', question }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -2154,10 +2154,11 @@
     preview.innerHTML = '<div class="proposal-preview-empty"><div class="icon">⏳</div><div>Writing your proposal…</div></div>';
 
     try {
-      const res = await fetch('/api/generate-proposal', {
+      const res = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          action:         'proposal',
           client_name:    clientName,
           business_name:  businessName,
           business_type:  businessType,
@@ -2548,10 +2549,10 @@
         const card    = btn.closest('.email-card');
         const emailId = card.dataset.id;
         if (emailId) {
-          await fetch(`/api/gmail-dismiss`, {
+          await fetch(`/api/gmail-send`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ emailId }),
+            body: JSON.stringify({ action: 'dismiss', emailId }),
           });
         }
         card.style.opacity = '0';

@@ -85,5 +85,65 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true });
   }
 
+  // GET with ?run=1 — trigger sequence runner
+  if (req.method === 'GET' && req.query.run === '1') {
+    const now = new Date().toISOString();
+    let sent = 0, failed = 0, completed = 0;
+    const dueRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/lead_sequences?status=eq.active&next_send_at=lte.${encodeURIComponent(now)}&select=*`,
+      { headers: SB() }
+    );
+    const due = await dueRes.json();
+    if (!due || due.length === 0) return res.status(200).json({ sent: 0, message: 'No emails due' });
+
+    function personalize(text, lead) {
+      return text
+        .replace(/\{\{name\}\}/g, lead.lead_name?.split(' ')[0] || 'there')
+        .replace(/\{\{insurance_type\}\}/g, lead.lead_insurance_type || 'insurance');
+    }
+
+    for (const enrollment of due) {
+      try {
+        const stepRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/sequence_steps?sequence_id=eq.${enrollment.sequence_id}&step_number=eq.${enrollment.current_step}&select=*`,
+          { headers: SB() }
+        );
+        const steps = await stepRes.json();
+        if (!steps || steps.length === 0) {
+          await fetch(`${SUPABASE_URL}/rest/v1/lead_sequences?id=eq.${enrollment.id}`, {
+            method: 'PATCH', headers: SB(), body: JSON.stringify({ status: 'completed' }),
+          });
+          completed++; continue;
+        }
+        const step = steps[0];
+        const sendRes = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.RESEND_API_KEY}` },
+          body: JSON.stringify({ from: 'Bryan <hello@nxtstepos.com>', to: enrollment.lead_email, subject: personalize(step.subject, enrollment), text: personalize(step.body, enrollment) }),
+        });
+        if (!sendRes.ok) { failed++; continue; }
+        const nextStepRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/sequence_steps?sequence_id=eq.${enrollment.sequence_id}&step_number=eq.${enrollment.current_step + 1}&select=*`,
+          { headers: SB() }
+        );
+        const nextSteps = await nextStepRes.json();
+        if (nextSteps && nextSteps.length > 0) {
+          const nextSendAt = new Date(); nextSendAt.setDate(nextSendAt.getDate() + nextSteps[0].delay_days);
+          await fetch(`${SUPABASE_URL}/rest/v1/lead_sequences?id=eq.${enrollment.id}`, {
+            method: 'PATCH', headers: SB(),
+            body: JSON.stringify({ current_step: enrollment.current_step + 1, next_send_at: nextSendAt.toISOString(), last_sent_at: now }),
+          });
+        } else {
+          await fetch(`${SUPABASE_URL}/rest/v1/lead_sequences?id=eq.${enrollment.id}`, {
+            method: 'PATCH', headers: SB(), body: JSON.stringify({ status: 'completed', last_sent_at: now }),
+          });
+          completed++;
+        }
+        sent++;
+      } catch (err) { failed++; }
+    }
+    return res.status(200).json({ sent, failed, completed });
+  }
+
   return res.status(405).json({ error: 'Method not allowed' });
 }
