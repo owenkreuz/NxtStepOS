@@ -1,12 +1,7 @@
 {
-  "crons": [
-    {
-      "path": "/api/sequence-run",
-      "schedule": "0 14 * * *"
-    },
-    {
-      "path": "/api/renewal-run",
-      "schedule": "0 15 * * *"
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 60
     }
-  ]
+  }
 }
